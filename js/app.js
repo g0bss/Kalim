@@ -665,6 +665,7 @@
 
   function breakCombo(reasonText) {
     state.combo = 0;
+    state.wrongHitsCount = (state.wrongHitsCount || 0) + 1;
     const comboEl = document.getElementById("hudCombo");
     if (comboEl) {
       comboEl.classList.add("broken");
@@ -723,8 +724,8 @@
           state.triggeredEventIndices.add(nextIdx);
           state.score += 100;
           state.combo += 1;
+          if (state.combo > (state.runMaxCombo || 0)) state.runMaxCombo = state.combo;
           if (state.combo > state.maxCombo) state.maxCombo = state.combo;
-          window.KalimDB.recordSongScore(state.currentSong.id, state.score, state.maxCombo);
           showHitFeedback("Perfeito", pal.hitLine);
           updateHeroHUD();
         }
@@ -756,8 +757,8 @@
           const isPerfect = diff < 0.25;
           state.score += isPerfect ? 100 : 60;
           state.combo += 1;
+          if (state.combo > (state.runMaxCombo || 0)) state.runMaxCombo = state.combo;
           if (state.combo > state.maxCombo) state.maxCombo = state.combo;
-          window.KalimDB.recordSongScore(state.currentSong.id, state.score, state.maxCombo);
           showHitFeedback(isPerfect ? "Perfeito" : "Bom", pal.hitLine);
           updateHeroHUD();
         }
@@ -811,24 +812,80 @@
     return Math.max(2.5, beatsPerSec * 3.0);
   }
 
+  function closeSongResultOverlay() {
+    const overlay = document.getElementById("songResultOverlay");
+    if (overlay) overlay.classList.remove("open");
+  }
+
+  function completeSongAndShowResults() {
+    state.isPlaying = false;
+    clearTargetCueTines();
+    updatePlayPauseButton();
+
+    const song = state.currentSong;
+    if (!song) return;
+
+    const allStats = window.KalimDB.getStats();
+    const prevRecord = (allStats[song.id] && allStats[song.id].highScore) || 0;
+    const isNewRecord = state.score > prevRecord && state.score > 0;
+
+    if (state.score > 0) {
+      window.KalimDB.recordSongScore(song.id, state.score, state.runMaxCombo || state.combo);
+      renderLibraryView();
+    }
+
+    const updatedStats = window.KalimDB.getStats();
+    const bestScore = Math.max(state.score, (updatedStats[song.id] && updatedStats[song.id].highScore) || 0);
+
+    const totalEvents = (song.events && song.events.length) || 1;
+    const hitEvents = state.triggeredEventIndices.size;
+    const wrongCount = state.wrongHitsCount || 0;
+    const accuracy = Math.min(100, Math.max(0, Math.round((hitEvents / Math.max(totalEvents, hitEvents + wrongCount)) * 100)));
+
+    const titleEl = document.getElementById("resultSongTitle");
+    const badgeEl = document.getElementById("resultNewRecordBadge");
+    const accEl = document.getElementById("resultAccuracy");
+    const scoreEl = document.getElementById("resultScore");
+    const comboEl = document.getElementById("resultMaxCombo");
+    const bestEl = document.getElementById("resultBestScore");
+    const sumEl = document.getElementById("resultNotesSummary");
+
+    if (titleEl) titleEl.textContent = song.title;
+    if (badgeEl) badgeEl.style.display = isNewRecord ? "inline-flex" : "none";
+    if (accEl) accEl.textContent = `${accuracy}%`;
+    if (scoreEl) scoreEl.textContent = `${state.score} pts`;
+    if (comboEl) comboEl.textContent = `${state.runMaxCombo || 0}x`;
+    if (bestEl) bestEl.textContent = `${bestScore} pts`;
+    if (sumEl) {
+      sumEl.textContent = `${hitEvents} de ${totalEvents} notas acertadas · ${wrongCount} ${wrongCount === 1 ? "erro" : "erros"}`;
+    }
+
+    const overlay = document.getElementById("songResultOverlay");
+    if (overlay) overlay.classList.add("open");
+  }
+
   function resetPlayback() {
     state.isPlaying = false;
     state.currentBeat = -getPrepLeadInBeats();
     state.score = 0;
     state.combo = 0;
+    state.runMaxCombo = 0;
+    state.wrongHitsCount = 0;
     state.triggeredEventIndices.clear();
     state.missedEventIndices.clear();
     state.visualPulsedEventIndices.clear();
     state.satisfiedDegreesForWait.clear();
     clearTargetCueTines();
+    closeSongResultOverlay();
     updatePlayPauseButton();
     updateHeroHUD();
   }
 
   function togglePlayPause() {
     window.KalimbaAudio.initContext();
+    closeSongResultOverlay();
     const total = getSongTotalBeats(state.currentSong);
-    if (state.currentBeat >= total + 1) {
+    if (state.currentBeat >= total) {
       resetPlayback();
     }
     if (!state.isPlaying && state.currentBeat <= 0.05) {
@@ -925,6 +982,8 @@
             state.missedEventIndices.add(i);
             if (state.combo > 0) {
               breakCombo("Nota perdida");
+            } else {
+              state.wrongHitsCount = (state.wrongHitsCount || 0) + 1;
             }
           }
         }
@@ -933,16 +992,14 @@
       state.currentBeat = nextBeat;
 
       const totalBeats = getSongTotalBeats(state.currentSong);
+      const allWaitNotesDone = state.playStyle === "wait" && findNextPendingEventIndex() === -1;
       if (state.loopEnabled && state.currentBeat >= state.loopEndBeat) {
         seekToBeat(state.loopStartBeat);
-      } else if (state.currentBeat >= totalBeats + 1.5) {
-        state.isPlaying = false;
-        updatePlayPauseButton();
-        if (state.score > 0 && state.currentSong) {
-          window.KalimDB.recordSongScore(state.currentSong.id, state.score, state.maxCombo);
-          renderLibraryView();
-        }
-        showHitFeedback("Concluído", "var(--primary)");
+      } else if (
+        state.currentBeat >= totalBeats + 1.2 ||
+        (allWaitNotesDone && state.currentBeat >= totalBeats - 0.2)
+      ) {
+        completeSongAndShowResults();
       }
 
       updateHeroHUD();
@@ -1537,6 +1594,29 @@
       resetPlayback();
       togglePlayPause();
     };
+
+    const btnResultReplay = document.getElementById("btnResultReplay");
+    if (btnResultReplay) {
+      btnResultReplay.onclick = () => {
+        resetPlayback();
+        togglePlayPause();
+      };
+    }
+
+    const btnResultLibrary = document.getElementById("btnResultLibrary");
+    if (btnResultLibrary) {
+      btnResultLibrary.onclick = () => {
+        closeSongResultOverlay();
+        switchTab("library");
+      };
+    }
+
+    const btnResultClose = document.getElementById("btnResultClose");
+    if (btnResultClose) {
+      btnResultClose.onclick = () => {
+        closeSongResultOverlay();
+      };
+    }
 
     const highwayTapArea = document.getElementById("highwayTapArea");
     if (highwayTapArea) {

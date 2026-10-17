@@ -192,6 +192,54 @@
               <div id="heroTinesRow" class="tines-row"></div>
             </div>
           </div>
+
+          <!-- TELA DE RESULTADO AO FINALIZAR A MÚSICA -->
+          <div id="songResultOverlay" class="song-result-overlay">
+            <div class="song-result-card">
+              <div class="song-result-header">
+                <div class="song-result-title-group">
+                  <span class="song-result-subtitle">Música Concluída</span>
+                  <h3 id="resultSongTitle" class="song-result-title">No Surprises</h3>
+                </div>
+                <span id="resultNewRecordBadge" class="meta-badge accent" style="display:none;">Novo Recorde</span>
+              </div>
+
+              <div class="song-result-stats-grid">
+                <div class="result-stat-box">
+                  <span class="result-stat-label">Precisão</span>
+                  <strong id="resultAccuracy" class="result-stat-value highlight">100%</strong>
+                </div>
+                <div class="result-stat-box">
+                  <span class="result-stat-label">Pontuação</span>
+                  <strong id="resultScore" class="result-stat-value">0 pts</strong>
+                </div>
+                <div class="result-stat-box">
+                  <span class="result-stat-label">Combo Máx.</span>
+                  <strong id="resultMaxCombo" class="result-stat-value">0x</strong>
+                </div>
+                <div class="result-stat-box">
+                  <span class="result-stat-label">Melhor Marca</span>
+                  <strong id="resultBestScore" class="result-stat-value">0 pts</strong>
+                </div>
+              </div>
+
+              <div id="resultNotesSummary" class="song-result-summary">0 de 0 notas acertadas</div>
+
+              <div class="song-result-actions">
+                <button id="btnResultReplay" class="clean-btn primary">
+                  <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                  <span>Repetir Música</span>
+                </button>
+                <button id="btnResultLibrary" class="clean-btn">
+                  <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                  <span>Trocar Música</span>
+                </button>
+                <button id="btnResultClose" class="clean-btn">
+                  <span>Fechar</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -385,6 +433,7 @@
   <script src="./js/songs-catalog.js"></script>
   <script src="./js/kalimba-config.js"></script>
   <script src="./js/db.js"></script>
+  <script src="./js/kalimba-samples.js"></script>
   <script src="./js/audio-engine.js"></script>
   <script src="./js/app.js"></script>
 </body>

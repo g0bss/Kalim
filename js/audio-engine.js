@@ -1,27 +1,52 @@
-// Motor de Síntese Acústica de Kalimba (Web Audio API) — Otimizado para iOS (iPhone/iPad) e Desktop
+// Motor de Áudio com Gravações Reais de Kalimba Acústica (MP3 Multi-Sampled C3–C7)
+// Compatível com iOS (iPhone/iPad), Android e Desktop
 window.KalimbaAudio = (function () {
   let ctx = null;
   let masterGain = null;
   let compressor = null;
-  let reverbNode = null;
   let isMuted = false;
   let isUnlocked = false;
   let htmlAudioUnlockEl = null;
-  let volume = 0.95;
+  let volume = 1.0;
 
-  // Pequeno arquivo WAV silencioso válido (PCM 8-bit 8kHz mono) para forçar o iOS Safari
-  // a usar o canal de Mídia ("playback") mesmo com a chave Modo Silencioso ativada no iPhone.
+  // Mapa de buffers decodificados por número MIDI (48 = C3 até 96 = C7)
+  const decodedBuffers = new Map();
+  const decodingPromises = new Map();
+
+  const NOTE_NAMES = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+
+  // WAV silencioso curto para destravar o canal de mídia ("playback") no iOS Safari
   const SILENT_WAV_DATA_URI =
     "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+
+  function midiToNoteName(midi) {
+    const clamped = Math.max(48, Math.min(96, Math.round(midi)));
+    const noteIdx = clamped % 12;
+    const octave = Math.floor(clamped / 12) - 1;
+    return `${NOTE_NAMES[noteIdx]}${octave}`;
+  }
+
+  function freqToMidi(freq) {
+    return 69 + 12 * Math.log2(freq / 440);
+  }
+
+  function base64DataUriToArrayBuffer(dataUri) {
+    const base64 = dataUri.split(",")[1] || "";
+    const binary = window.atob(base64);
+    const len = binary.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes.buffer;
+  }
 
   function configureIOSAudioSession() {
     try {
       if (typeof navigator !== "undefined" && navigator.audioSession) {
         navigator.audioSession.type = "playback";
       }
-    } catch (e) {
-      // Ignorar caso não suportado no navegador
-    }
+    } catch (e) {}
   }
 
   function unlockIOSHtmlAudio() {
@@ -33,12 +58,62 @@ window.KalimbaAudio = (function () {
         htmlAudioUnlockEl.setAttribute("webkit-playsinline", "true");
         htmlAudioUnlockEl.volume = 0.01;
       }
-      const playPromise = htmlAudioUnlockEl.play();
-      if (playPromise && typeof playPromise.then === "function") {
-        playPromise.catch(() => {});
+      const p = htmlAudioUnlockEl.play();
+      if (p && typeof p.then === "function") p.catch(() => {});
+    } catch (e) {}
+  }
+
+  function decodeNoteSample(noteName) {
+    if (!ctx || !window.KALIMBA_REAL_SAMPLES) return Promise.resolve(null);
+    if (decodedBuffers.has(noteName)) {
+      return Promise.resolve(decodedBuffers.get(noteName));
+    }
+    if (decodingPromises.has(noteName)) {
+      return decodingPromises.get(noteName);
+    }
+
+    const dataUri = window.KALIMBA_REAL_SAMPLES[noteName];
+    if (!dataUri) return Promise.resolve(null);
+
+    const promise = new Promise((resolve) => {
+      try {
+        const arrayBuf = base64DataUriToArrayBuffer(dataUri);
+        // Usa callback clássico + Promise para máxima compatibilidade com Safari iOS
+        const res = ctx.decodeAudioData(
+          arrayBuf,
+          (audioBuffer) => {
+            decodedBuffers.set(noteName, audioBuffer);
+            resolve(audioBuffer);
+          },
+          () => resolve(null)
+        );
+        if (res && typeof res.then === "function") {
+          res.catch(() => {});
+        }
+      } catch (e) {
+        resolve(null);
       }
-    } catch (e) {
-      // Ignorar erros de autoplay
+    });
+
+    decodingPromises.set(noteName, promise);
+    return promise;
+  }
+
+  // Pré-decodifica prioritariamente as 17 teclas de Dó Maior (C4 a E6) e depois as demais
+  async function preloadAllKalimbaSamples() {
+    if (!ctx || !window.KALIMBA_REAL_SAMPLES) return;
+    const priorityNotes = [
+      "C4", "D4", "E4", "F4", "G4", "A4", "B4",
+      "C5", "D5", "E5", "F5", "G5", "A5", "B5",
+      "C6", "D6", "E6"
+    ];
+    for (const n of priorityNotes) {
+      await decodeNoteSample(n);
+    }
+    for (const n of Object.keys(window.KALIMBA_REAL_SAMPLES)) {
+      if (!decodedBuffers.has(n)) {
+        decodeNoteSample(n);
+      }
     }
   }
 
@@ -53,68 +128,38 @@ window.KalimbaAudio = (function () {
       masterGain = ctx.createGain();
       masterGain.gain.value = volume;
 
-      // Compressor suave para dar mais volume e presença no alto-falante do iPhone sem distorcer
       compressor = ctx.createDynamicsCompressor();
-      compressor.threshold.setValueAtTime(-18, ctx.currentTime);
-      compressor.knee.setValueAtTime(24, ctx.currentTime);
-      compressor.ratio.setValueAtTime(4, ctx.currentTime);
-      compressor.attack.setValueAtTime(0.003, ctx.currentTime);
-      compressor.release.setValueAtTime(0.2, ctx.currentTime);
-
-      // Criar ambiência acústica de caixa de ressonância de madeira (Delay + Filtro passa-baixa)
-      const delay = ctx.createDelay();
-      delay.delayTime.value = 0.085;
-
-      const feedback = ctx.createGain();
-      feedback.gain.value = 0.24;
-
-      const filter = ctx.createBiquadFilter();
-      filter.type = "lowpass";
-      filter.frequency.value = 1800;
-
-      const wetGain = ctx.createGain();
-      wetGain.gain.value = 0.24;
+      compressor.threshold.setValueAtTime(-14, ctx.currentTime);
+      compressor.knee.setValueAtTime(20, ctx.currentTime);
+      compressor.ratio.setValueAtTime(3.2, ctx.currentTime);
+      compressor.attack.setValueAtTime(0.002, ctx.currentTime);
+      compressor.release.setValueAtTime(0.18, ctx.currentTime);
 
       masterGain.connect(compressor);
-      masterGain.connect(delay);
-      delay.connect(filter);
-      filter.connect(feedback);
-      feedback.connect(delay);
-      filter.connect(wetGain);
-      wetGain.connect(compressor);
       compressor.connect(ctx.destination);
 
-      reverbNode = masterGain;
+      // Inicia o pré-carregamento dos MP3 reais da Kalimba em background
+      preloadAllKalimbaSamples();
     }
 
     if (ctx.state !== "running") {
       ctx.resume().catch(() => {});
     }
 
-    // Tocar buffer silencioso de 1 sample para destravar o WebKit AudioContext no iOS
     if (!isUnlocked && ctx) {
       try {
         const buffer = ctx.createBuffer(1, 1, 22050);
         const source = ctx.createBufferSource();
         source.buffer = buffer;
         source.connect(ctx.destination);
-        if (source.start) {
-          source.start(0);
-        } else if (source.noteOn) {
-          source.noteOn(0);
-        }
-        if (ctx.state === "running") {
-          isUnlocked = true;
-        }
-      } catch (e) {
-        // Ignorar
-      }
+        if (source.start) source.start(0);
+        if (ctx.state === "running") isUnlocked = true;
+      } catch (e) {}
     }
 
     return ctx;
   }
 
-  // Destravar automaticamente no primeiro toque ou clique em qualquer lugar da tela (iOS/Android)
   function setupGlobalTouchUnlock() {
     const unlockHandler = () => {
       unlockIOSHtmlAudio();
@@ -128,7 +173,6 @@ window.KalimbaAudio = (function () {
       window.addEventListener(evt, unlockHandler, { passive: true, capture: true });
     });
 
-    // Quando o usuário volta para a aba ou desbloqueia a tela do iPhone, o iOS coloca o áudio em "interrupted"
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible" && ctx && ctx.state !== "running") {
         configureIOSAudioSession();
@@ -139,83 +183,73 @@ window.KalimbaAudio = (function () {
 
   setupGlobalTouchUnlock();
 
-  function triggerNoteVoices(freq, velocity, durationScale) {
-    if (!ctx || !reverbNode) return;
+  function playDecodedBuffer(audioBuffer, rate, velocity) {
+    if (!ctx || !masterGain || !audioBuffer) return;
     const now = ctx.currentTime;
+    const source = ctx.createBufferSource();
+    source.buffer = audioBuffer;
+    source.playbackRate.setValueAtTime(rate, now);
+
     const noteGain = ctx.createGain();
-    noteGain.connect(reverbNode);
+    const gainVal = Math.min(1.35, Math.max(0.2, velocity * 1.15));
+    noteGain.gain.setValueAtTime(gainVal, now);
 
-    // Tempo de decaimento varia conforme a frequência
-    const baseDecay = Math.max(1.15, Math.min(2.7, (440 / freq) * 1.48)) * durationScale;
-    const peak = Math.min(0.62, 0.48 * velocity);
-
-    noteGain.gain.setValueAtTime(0.0001, now);
-    noteGain.gain.linearRampToValueAtTime(peak, now + 0.005);
-    noteGain.gain.exponentialRampToValueAtTime(peak * 0.48, now + 0.14);
-    noteGain.gain.exponentialRampToValueAtTime(0.0001, now + baseDecay);
-
-    // 1. Fundamental (Corpo de madeira + lâmina)
-    const oscFund = ctx.createOscillator();
-    oscFund.type = "sine";
-    oscFund.frequency.setValueAtTime(freq * 1.006, now);
-    oscFund.frequency.exponentialRampToValueAtTime(freq, now + 0.025);
-
-    // 2. Segundo harmônico (Ressonância da caixa)
-    const oscBody = ctx.createOscillator();
-    oscBody.type = "triangle";
-    oscBody.frequency.setValueAtTime(freq * 2, now);
-    const bodyGain = ctx.createGain();
-    bodyGain.gain.setValueAtTime(0.20, now);
-    bodyGain.gain.exponentialRampToValueAtTime(0.001, now + baseDecay * 0.38);
-
-    // 3. Harmônico metálico característico da Kalimba ("Pling" inarmônico ~2.98x)
-    const oscTine = ctx.createOscillator();
-    oscTine.type = "sine";
-    oscTine.frequency.setValueAtTime(freq * 2.98, now);
-    const tineGain = ctx.createGain();
-    tineGain.gain.setValueAtTime(0.25 * velocity, now);
-    tineGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
-
-    oscFund.connect(noteGain);
-    oscBody.connect(bodyGain);
-    bodyGain.connect(noteGain);
-    oscTine.connect(tineGain);
-    tineGain.connect(noteGain);
-
-    oscFund.start(now);
-    oscBody.start(now);
-    oscTine.start(now);
-
-    const stopTime = now + baseDecay + 0.05;
-    oscFund.stop(stopTime);
-    oscBody.stop(stopTime);
-    oscTine.stop(stopTime);
+    source.connect(noteGain);
+    noteGain.connect(masterGain);
+    source.start(now);
   }
 
-  function playNote(freq, velocity = 0.95, durationScale = 1.0) {
+  function playHtmlAudioFallback(noteName, velocity) {
+    if (!window.KALIMBA_REAL_SAMPLES || !window.KALIMBA_REAL_SAMPLES[noteName]) return;
+    try {
+      const audio = new Audio(window.KALIMBA_REAL_SAMPLES[noteName]);
+      audio.setAttribute("playsinline", "true");
+      audio.volume = Math.min(1.0, Math.max(0.15, velocity));
+      const p = audio.play();
+      if (p && typeof p.then === "function") p.catch(() => {});
+    } catch (e) {}
+  }
+
+  function playNote(freq, velocity = 0.95) {
     if (isMuted || !freq) return;
     initContext();
-    if (!ctx) return;
 
-    if (ctx.state !== "running") {
-      unlockIOSHtmlAudio();
-      ctx.resume().then(() => {
-        triggerNoteVoices(freq, velocity, durationScale);
-      }).catch(() => {});
+    const exactMidi = freqToMidi(freq);
+    const nearestMidi = Math.max(48, Math.min(96, Math.round(exactMidi)));
+    const noteName = midiToNoteName(nearestMidi);
+    const playbackRate = Math.pow(2, (exactMidi - nearestMidi) / 12);
+
+    const cachedBuffer = decodedBuffers.get(noteName);
+    if (cachedBuffer && ctx && ctx.state === "running") {
+      playDecodedBuffer(cachedBuffer, playbackRate, velocity);
       return;
     }
 
-    triggerNoteVoices(freq, velocity, durationScale);
+    // Caso o buffer ainda esteja decodificando ou o iOS esteja destravando no primeiro toque:
+    if (ctx) {
+      if (ctx.state !== "running") {
+        ctx.resume().catch(() => {});
+      }
+      decodeNoteSample(noteName).then((buf) => {
+        if (buf && ctx && ctx.state === "running") {
+          playDecodedBuffer(buf, playbackRate, velocity);
+        } else {
+          playHtmlAudioFallback(noteName, velocity);
+        }
+      });
+    } else {
+      playHtmlAudioFallback(noteName, velocity);
+    }
   }
 
-  function playChord(freqs, velocity = 0.9, arpeggiateMs = 18) {
+  function playChord(freqs, velocity = 0.92, arpeggiateMs = 18) {
     if (isMuted || !freqs || !freqs.length) return;
     initContext();
     freqs.forEach((f, idx) => {
       if (arpeggiateMs > 0 && freqs.length > 1) {
-        setTimeout(() => playNote(f, velocity * 0.92), idx * arpeggiateMs);
+        setTimeout(() => playNote(f, velocity * 0.95), idx * arpeggiateMs);
       } else {
-        playNote(f, velocity * 0.92);
+        playNote(f, velocity * 0.95);
       }
     });
   }
@@ -223,18 +257,11 @@ window.KalimbaAudio = (function () {
   function playMetronomeTick(isDownbeat = false) {
     if (isMuted) return;
     initContext();
-    if (!ctx) return;
-    const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = "triangle";
-    osc.frequency.setValueAtTime(isDownbeat ? 1100 : 750, now);
-    gain.gain.setValueAtTime(0.14, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.04);
+    const noteName = isDownbeat ? "C6" : "C5";
+    const buf = decodedBuffers.get(noteName);
+    if (buf) {
+      playDecodedBuffer(buf, 1.0, 0.35);
+    }
   }
 
   function setMuted(mute) {
