@@ -1,0 +1,1104 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap');
+
+:root,
+[data-theme="peach"] {
+  --bg-main: #fae5d3;
+  --bg-highway: #fdf2e9;
+  --bg-surface: rgba(255, 250, 245, 0.86);
+  --bg-card: #ffffff;
+  --bg-subtle: #f7dcC4;
+
+  --tine-bg: #fffcf9;
+  --tine-marked-bg: #f5b799;
+  --tine-text: #6e473b;
+  --tine-marked-text: #593326;
+  --tine-shadow: 0 5px 0 rgba(186, 122, 95, 0.22);
+  --tine-marked-shadow: 0 5px 0 rgba(173, 102, 73, 0.28);
+
+  --primary: #e87a5d;
+  --primary-soft: rgba(232, 122, 93, 0.16);
+  --error: #ef4444;
+
+  --text-main: #5c3d33;
+  --text-muted: #9e7b6e;
+  --border-soft: rgba(158, 123, 110, 0.16);
+
+  --tile-oct-low: #68c4a4;
+  --tile-oct-mid: #e87a5d;
+  --tile-oct-high: #63add0;
+  --tile-oct-ultra: #9d85d6;
+
+  --lane-marked: rgba(245, 183, 153, 0.18);
+  --lane-center: rgba(232, 122, 93, 0.16);
+  --lane-line: rgba(158, 123, 110, 0.10);
+  --soundhole-bg: #dc9e7e;
+  --soundhole-face: #5c3d33;
+}
+
+[data-theme="sakura"] {
+  --bg-main: #fce4ec;
+  --bg-highway: #fff0f5;
+  --bg-surface: rgba(255, 248, 250, 0.86);
+  --bg-card: #ffffff;
+  --bg-subtle: #f8bbd0;
+
+  --tine-bg: #fffcfd;
+  --tine-marked-bg: #f4a6be;
+  --tine-text: #633948;
+  --tine-marked-text: #4f2635;
+  --tine-shadow: 0 5px 0 rgba(186, 110, 138, 0.22);
+  --tine-marked-shadow: 0 5px 0 rgba(168, 86, 116, 0.28);
+
+  --primary: #e56b92;
+  --primary-soft: rgba(229, 107, 146, 0.16);
+  --error: #ef4444;
+
+  --text-main: #593240;
+  --text-muted: #9c7180;
+  --border-soft: rgba(156, 113, 128, 0.16);
+
+  --tile-oct-low: #68c4a4;
+  --tile-oct-mid: #e56b92;
+  --tile-oct-high: #68aee0;
+  --tile-oct-ultra: #a882dd;
+
+  --lane-marked: rgba(244, 166, 190, 0.18);
+  --lane-center: rgba(229, 107, 146, 0.16);
+  --lane-line: rgba(156, 113, 128, 0.10);
+  --soundhole-bg: #e092ac;
+  --soundhole-face: #593240;
+}
+
+[data-theme="sky"] {
+  --bg-main: #dfeefc;
+  --bg-highway: #f2f8ff;
+  --bg-surface: rgba(247, 251, 255, 0.88);
+  --bg-card: #ffffff;
+  --bg-subtle: #c7e1fa;
+
+  --tine-bg: #ffffff;
+  --tine-marked-bg: #9ac6f5;
+  --tine-text: #2c4a6b;
+  --tine-marked-text: #1b3654;
+  --tine-shadow: 0 5px 0 rgba(95, 142, 194, 0.22);
+  --tine-marked-shadow: 0 5px 0 rgba(74, 122, 179, 0.28);
+
+  --primary: #4e91e8;
+  --primary-soft: rgba(78, 145, 232, 0.16);
+  --error: #ef4444;
+
+  --text-main: #28425e;
+  --text-muted: #6c88a6;
+  --border-soft: rgba(108, 136, 166, 0.16);
+
+  --tile-oct-low: #4db6ac;
+  --tile-oct-mid: #4e91e8;
+  --tile-oct-high: #eb7aa3;
+  --tile-oct-ultra: #9575cd;
+
+  --lane-marked: rgba(154, 198, 245, 0.20);
+  --lane-center: rgba(78, 145, 232, 0.16);
+  --lane-line: rgba(108, 136, 166, 0.10);
+  --soundhole-bg: #8eb9e8;
+  --soundhole-face: #28425e;
+}
+
+[data-theme="matcha"] {
+  --bg-main: #dfefe4;
+  --bg-highway: #f2f9f4;
+  --bg-surface: rgba(247, 252, 249, 0.88);
+  --bg-card: #ffffff;
+  --bg-subtle: #c5e3cf;
+
+  --tine-bg: #ffffff;
+  --tine-marked-bg: #95cfa9;
+  --tine-text: #2d4c39;
+  --tine-marked-text: #1c3827;
+  --tine-shadow: 0 5px 0 rgba(90, 145, 110, 0.22);
+  --tine-marked-shadow: 0 5px 0 rgba(70, 125, 90, 0.28);
+
+  --primary: #4aa86e;
+  --primary-soft: rgba(74, 168, 110, 0.16);
+  --error: #ef4444;
+
+  --text-main: #294534;
+  --text-muted: #6b8c77;
+  --border-soft: rgba(107, 140, 119, 0.16);
+
+  --tile-oct-low: #eab308;
+  --tile-oct-mid: #4aa86e;
+  --tile-oct-high: #529be0;
+  --tile-oct-ultra: #d977a8;
+
+  --lane-marked: rgba(149, 207, 169, 0.20);
+  --lane-center: rgba(74, 168, 110, 0.16);
+  --lane-line: rgba(107, 140, 119, 0.10);
+  --soundhole-bg: #8ac29d;
+  --soundhole-face: #294534;
+}
+
+[data-theme="lofi"] {
+  --bg-main: #231f33;
+  --bg-highway: #1b1828;
+  --bg-surface: rgba(38, 33, 56, 0.88);
+  --bg-card: #2c2642;
+  --bg-subtle: #332c4d;
+
+  --tine-bg: #3b3357;
+  --tine-marked-bg: #e5988e;
+  --tine-text: #ede8f5;
+  --tine-marked-text: #361b18;
+  --tine-shadow: 0 5px 0 rgba(0, 0, 0, 0.35);
+  --tine-marked-shadow: 0 5px 0 rgba(0, 0, 0, 0.35);
+
+  --primary: #e5988e;
+  --primary-soft: rgba(229, 152, 142, 0.18);
+  --error: #f87171;
+
+  --text-main: #f2edf9;
+  --text-muted: #9e94b8;
+  --border-soft: rgba(255, 255, 255, 0.10);
+
+  --tile-oct-low: #5ec2a0;
+  --tile-oct-mid: #e5988e;
+  --tile-oct-high: #68aee0;
+  --tile-oct-ultra: #b794f4;
+
+  --lane-marked: rgba(229, 152, 142, 0.11);
+  --lane-center: rgba(229, 152, 142, 0.16);
+  --lane-line: rgba(255, 255, 255, 0.06);
+  --soundhole-bg: #171422;
+  --soundhole-face: #e5988e;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  margin: 0;
+  background: var(--bg-main);
+  position: relative;
+  --kalimba-width: 100%;
+}
+
+/* BARRA SUPERIOR FLUTUANTE MINIMALISTA */
+.floating-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: var(--bg-surface);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-soft);
+  gap: 10px;
+  flex-shrink: 0;
+  z-index: 30;
+}
+
+.topbar-left,
+.topbar-center,
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 4px;
+}
+
+.brand-logo-img {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  object-fit: cover;
+}
+
+.brand-title {
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: -0.3px;
+  color: var(--text-main);
+}
+
+.mode-tabs {
+  display: inline-flex;
+  background: var(--bg-subtle);
+  padding: 3px;
+  border-radius: 999px;
+  gap: 2px;
+}
+
+.mode-tab {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.mode-tab svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mode-tab.active {
+  background: var(--bg-card);
+  color: var(--text-main);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.clean-select,
+.clean-btn,
+.icon-circle-btn {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.14s ease;
+}
+
+.icon-circle-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
+.clean-btn svg,
+.icon-circle-btn svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.clean-btn.primary {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.clean-btn.active,
+.icon-circle-btn.active {
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.clean-btn.danger {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--error);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* POPOVER DE CONFIGURAÇÕES */
+.settings-popover {
+  position: absolute;
+  top: 52px;
+  right: 14px;
+  width: 290px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settings-popover.open {
+  display: flex;
+}
+
+.setting-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.setting-row label {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.theme-dots {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.theme-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2.5px solid transparent;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.theme-dot.active {
+  border-color: var(--text-main);
+  transform: scale(1.12);
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.view-section {
+  display: none;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.view-section.active {
+  display: flex;
+}
+
+/* CONTROLES DO MODO TILES */
+.tiles-hud-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px;
+  background: var(--bg-highway);
+  border-bottom: 1px solid var(--border-soft);
+  gap: 10px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.tiles-transport-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.combo-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.combo-pill {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  transition: transform 0.12s ease;
+}
+
+.combo-pill.broken {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--error);
+}
+
+/* PALCO TELA CHEIA */
+.hero-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  touch-action: none;
+  background: var(--bg-highway);
+}
+
+.aligned-stage-column {
+  width: var(--kalimba-width);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.highway-container {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  background: var(--bg-highway);
+  overflow: hidden;
+}
+
+#heroCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.floating-lyric-banner {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-surface);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border-soft);
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-main);
+  pointer-events: none;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.hit-feedback {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 13px;
+  font-weight: 900;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  pointer-events: none;
+  z-index: 12;
+  opacity: 0;
+  transition: opacity 0.14s, transform 0.14s;
+}
+
+.hit-feedback.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+/* CORPO KEYLIMBA */
+.kalimba-board {
+  height: 44%;
+  min-height: 175px;
+  width: 100%;
+  background: var(--bg-main);
+  border-top: 2px solid var(--border-soft);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.kalimba-board.full-kalimba {
+  height: 100%;
+  border-top: none;
+}
+
+.soundhole {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  background: var(--soundhole-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+  transition: transform 0.14s ease;
+}
+
+.soundhole.bounce {
+  transform: translateX(-50%) scale(1.07);
+}
+
+.kawaii-face {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--soundhole-face);
+  user-select: none;
+}
+
+.kawaii-eyes {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.kawaii-eye {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--soundhole-face);
+}
+
+.kawaii-cheeks {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: -4px;
+}
+
+.kawaii-cheek {
+  width: 9px;
+  height: 4px;
+  border-radius: 50%;
+  background: #e56b6f;
+  opacity: 0.45;
+}
+
+.kawaii-mouth {
+  width: 10px;
+  height: 5px;
+  border-bottom: 2.2px solid var(--soundhole-face);
+  border-left: 2.2px solid var(--soundhole-face);
+  border-right: 2.2px solid var(--soundhole-face);
+  border-radius: 0 0 10px 10px;
+  margin-top: -3px;
+  transition: height 0.1s ease;
+}
+
+.soundhole.bounce .kawaii-mouth {
+  height: 8px;
+  background: var(--soundhole-face);
+}
+
+.tines-row {
+  flex: 1;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  padding: 0 2px;
+  gap: 3px;
+  position: relative;
+  z-index: 2;
+  touch-action: none;
+}
+
+.tine-slot {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.tine-metal {
+  width: 100%;
+  background: var(--tine-bg);
+  border-radius: 0 0 999px 999px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 10px;
+  gap: 2px;
+  box-shadow: var(--tine-shadow);
+  transition: transform 0.07s ease, background 0.12s ease, box-shadow 0.07s ease;
+  position: relative;
+}
+
+.tine-slot.marked-slot .tine-metal {
+  background: var(--tine-marked-bg);
+  box-shadow: var(--tine-marked-shadow);
+}
+
+.tine-slot.marked-slot .tine-degree,
+.tine-slot.marked-slot .tine-note {
+  color: var(--tine-marked-text);
+}
+
+.tine-octave-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  margin-bottom: 3px;
+  opacity: 0.7;
+}
+
+.oct-dot--1 { background: var(--tile-oct-low); }
+.oct-dot-0  { background: var(--tile-oct-mid); }
+.oct-dot-1  { background: var(--tile-oct-high); }
+.oct-dot-2  { background: var(--tile-oct-ultra); }
+
+.tine-degree {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--tine-text);
+  line-height: 1.05;
+}
+
+.tine-note {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.tine-slot.active .tine-metal {
+  transform: translateY(5px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+}
+
+.tine-slot.wrong-hit .tine-metal {
+  background: #fca5a5 !important;
+  transform: translateY(4px);
+}
+
+.tine-slot.cue-now .tine-metal {
+  box-shadow: 0 0 0 3px var(--primary), var(--tine-shadow);
+}
+
+/* =========================================================
+   ABA BIBLIOTECA DE MÚSICAS (MINIMALISTA E COMPLETA)
+   ========================================================= */
+.library-container {
+  max-width: 920px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.library-header-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 20px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.library-search-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.library-search-input {
+  flex: 1;
+  min-width: 200px;
+  background: var(--bg-highway);
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  padding: 8px 16px;
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+.library-search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.library-categories {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cat-pill {
+  background: var(--bg-highway);
+  color: var(--text-muted);
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+
+.cat-pill.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.songs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
+  gap: 12px;
+  padding-bottom: 24px;
+}
+
+.song-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  transition: transform 0.14s ease, border-color 0.14s ease;
+}
+
+.song-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+}
+
+.song-card.current-song {
+  border: 2px solid var(--primary);
+}
+
+.song-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.song-card-title {
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--text-main);
+  line-height: 1.25;
+}
+
+.song-card-artist {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.fav-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s ease, color 0.12s ease;
+}
+
+.fav-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  fill: none;
+}
+
+.fav-btn.favorited {
+  color: var(--primary);
+}
+
+.fav-btn.favorited svg {
+  fill: var(--primary);
+}
+
+.song-card-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.meta-badge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg-highway);
+  color: var(--text-muted);
+  border: 1px solid var(--border-soft);
+}
+
+.meta-badge.accent {
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-color: transparent;
+}
+
+.song-card-desc {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.song-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+/* MODO CIFRA CLUB & KTAB */
+.cifra-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.cifra-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 20px;
+  padding: 18px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.cifra-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 10px;
+  border-radius: 14px;
+  background: var(--bg-highway);
+  border-left: 3px solid var(--primary);
+}
+
+.cifra-token-box {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 40px;
+  padding: 6px 9px;
+  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.cifra-token-box:hover, .cifra-token-box.active {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  transform: translateY(-2px);
+}
+
+.cifra-token-note {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--primary);
+}
+
+.cifra-token-sub {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 800;
+}
+
+.cifra-token-lyric {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-top: 2px;
+}
+
+.ktab-grid-wrapper {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid var(--border-soft);
+}
+
+.ktab-row {
+  display: grid;
+  border-bottom: 1px dashed var(--border-soft);
+  min-height: 36px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.ktab-cell {
+  height: 100%;
+  border-right: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.ktab-cell.marked-col {
+  background: var(--lane-marked);
+}
+
+.ktab-pill {
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.mini-kalimba-drawer {
+  height: 120px;
+}
+
+/* EDITOR / CRIADOR DE MÚSICAS */
+.scrollable-view {
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.editor-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 20px;
+  padding: 18px;
+  max-width: 860px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-group label {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.form-input, .form-textarea {
+  background: var(--bg-highway);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 8px 12px;
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+.form-textarea {
+  min-height: 100px;
+  font-family: monospace;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.quick-tine-picker {
+  display: grid;
+  gap: 3px;
+  padding: 8px;
+  background: var(--bg-highway);
+  border-radius: 14px;
+  border: 1px solid var(--border-soft);
+}
+
+.picker-tine-btn {
+  padding: 8px 2px;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background: var(--tine-bg);
+  color: var(--tine-text);
+  font-size: 11px;
+  font-weight: 900;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.picker-tine-btn.marked {
+  background: var(--tine-marked-bg);
+  color: var(--tine-marked-text);
+  border-color: transparent;
+}
+
+.picker-tine-btn.selected {
+  background: var(--primary);
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .tine-degree { font-size: 11px; }
+  .tine-note { font-size: 8px; }
+  .tines-row { gap: 2px; padding: 0 1px; }
+  .mode-tab span { display: none; }
+  .brand-title { font-size: 15px; }
+}

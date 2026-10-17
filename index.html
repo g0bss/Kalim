@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="peach">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#fae5d3" />
+  <title>Kalim</title>
+  <link rel="icon" type="image/png" href="./assets/kalim-logo.png" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- BARRA SUPERIOR MINIMALISTA (ZERO EMOJIS, ÍCONES VETORIAIS SVG PUROS) -->
+    <header class="floating-topbar">
+      <div class="topbar-left">
+        <div class="brand-pill">
+          <img src="./assets/kalim-logo.png" alt="Kalim" class="brand-logo-img" />
+          <span class="brand-title">Kalim</span>
+        </div>
+
+        <nav class="mode-tabs" aria-label="Modos do Aplicativo">
+          <button class="mode-tab active" data-tab="hero" title="Modo Tiles">
+            <svg viewBox="0 0 24 24"><rect x="4" y="3" width="4" height="11" rx="2"/><rect x="10" y="7" width="4" height="14" rx="2"/><rect x="16" y="4" width="4" height="12" rx="2"/></svg>
+            <span>Tiles</span>
+          </button>
+          <button class="mode-tab" data-tab="library" title="Biblioteca de Músicas">
+            <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            <span>Biblioteca</span>
+          </button>
+          <button class="mode-tab" data-tab="cifra" title="Cifra e KTab">
+            <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span>Cifra</span>
+          </button>
+          <button class="mode-tab" data-tab="free" title="Kalimba Livre">
+            <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            <span>Livre</span>
+          </button>
+          <button class="mode-tab" data-tab="editor" title="Criar Música">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Criar</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="topbar-right">
+        <!-- Botão de Som -->
+        <button id="btnMute" class="icon-circle-btn active" title="Som">
+          <svg id="iconVolumeOn" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+        </button>
+
+        <!-- Botão Tela Cheia (Para alinhar o celular sobre a Kalimba física) -->
+        <button id="btnFullscreen" class="icon-circle-btn" title="Tela Cheia">
+          <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        </button>
+
+        <!-- Botão de Configurações (Estilo Keylimba) -->
+        <button id="btnSettingsToggle" class="icon-circle-btn" title="Configurações da Kalimba">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- POPOVER MINIMALISTA DE AJUSTES -->
+    <div id="settingsPopover" class="settings-popover">
+      <div class="setting-row">
+        <label>Cor do Kalim</label>
+        <div class="theme-dots">
+          <button class="theme-dot active" data-theme-choice="peach" style="background:#f5b799;" title="Pêssego"></button>
+          <button class="theme-dot" data-theme-choice="sakura" style="background:#f4a6be;" title="Sakura"></button>
+          <button class="theme-dot" data-theme-choice="sky" style="background:#9ac6f5;" title="Azul Suave"></button>
+          <button class="theme-dot" data-theme-choice="matcha" style="background:#95cfa9;" title="Menta"></button>
+          <button class="theme-dot" data-theme-choice="lofi" style="background:#3b3357;" title="Noturno"></button>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <label>Teclas da Kalimba (Referência: 17)</label>
+        <select id="selectSize" class="clean-select">
+          <option value="8">8 Teclas</option>
+          <option value="10">10 Teclas</option>
+          <option value="17" selected>17 Teclas (Padrão)</option>
+          <option value="21">21 Teclas</option>
+        </select>
+      </div>
+
+      <div class="setting-row">
+        <label>Afinação</label>
+        <select id="selectTuning" class="clean-select">
+          <option value="C_MAJOR" selected>Dó Maior (C)</option>
+          <option value="G_MAJOR">Sol Maior (G)</option>
+          <option value="BB_MAJOR">Si Bemol (Bb)</option>
+          <option value="F_MAJOR">Fá Maior (F)</option>
+          <option value="A_MINOR">Lá Menor (Am)</option>
+        </select>
+      </div>
+
+      <div class="setting-row">
+        <label>Notação nas Lâminas</label>
+        <select id="selectLabelMode" class="clean-select">
+          <option value="both" selected>Número + Nota (1 / C)</option>
+          <option value="number">Apenas Números (1, 2°)</option>
+          <option value="letter">Apenas Notas (C, D°)</option>
+        </select>
+      </div>
+
+      <div class="setting-row">
+        <label>Largura das Teclas na Tela (<span id="widthPctLabel">100%</span>)</label>
+        <input id="sliderKalimbaWidth" type="range" min="65" max="100" value="100" style="accent-color:var(--primary);" />
+        <span style="font-size:10px;color:var(--text-muted);font-weight:700;">Ajuste para alinhar exatamente com as 17 teclas da sua Kalimba física abaixo do celular.</span>
+      </div>
+    </div>
+
+    <!-- ÁREA PRINCIPAL EM TELA CHEIA -->
+    <main class="main-content">
+
+      <!-- =========================================================
+           ABA 1: MODO TILES (ESPERAR POR MIM / RITMO CONTÍNUO)
+           ========================================================= -->
+      <section id="view-hero" class="view-section active">
+        <div class="tiles-hud-bar">
+          <div class="tiles-transport-group">
+            <select id="heroSongSelect" class="clean-select" title="Escolher Música"></select>
+
+            <button id="btnPlayPause" class="clean-btn primary">
+              <svg id="iconPlayPause" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor"/></svg>
+              <span id="txtPlayPause">Iniciar</span>
+            </button>
+
+            <button id="btnRestart" class="icon-circle-btn" title="Recomeçar">
+              <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            </button>
+
+            <select id="selectPlayStyle" class="clean-select" title="Modo de Progresso">
+              <option value="wait" selected>Modo: Esperar por Mim</option>
+              <option value="flow">Modo: Ritmo Contínuo</option>
+            </select>
+
+            <select id="selectSpeed" class="clean-select" title="Velocidade">
+              <option value="0.5">0.5x</option>
+              <option value="0.75">0.75x</option>
+              <option value="1" selected>1.0x</option>
+              <option value="1.25">1.25x</option>
+            </select>
+
+            <button id="btnLoopSection" class="clean-btn" title="Repetir Trecho (Loop)">
+              <svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+              <span>Loop</span>
+            </button>
+          </div>
+
+          <div class="combo-display">
+            <input id="progressSlider" type="range" min="0" max="32" step="0.25" value="0" style="width:90px;accent-color:var(--primary);cursor:pointer;" title="Posição da Música" />
+            <span id="hudCombo" class="combo-pill">Combo 0x</span>
+            <span id="hudScore" style="color:var(--text-muted);">0 pts</span>
+          </div>
+        </div>
+
+        <!-- PALCO ALINHADO DE PONTA A PONTA -->
+        <div class="hero-stage">
+          <div class="aligned-stage-column">
+            <div class="highway-container">
+              <div id="floatingLyricBanner" class="floating-lyric-banner">Escolha uma música e toque em Iniciar</div>
+              <div id="hitFeedback" class="hit-feedback">Perfeito</div>
+              <canvas id="heroCanvas"></canvas>
+            </div>
+
+            <div class="kalimba-board">
+              <div class="soundhole" id="heroSoundhole">
+                <div class="kawaii-face">
+                  <div class="kawaii-eyes">
+                    <span class="kawaii-eye"></span>
+                    <span class="kawaii-eye"></span>
+                  </div>
+                  <div class="kawaii-cheeks">
+                    <span class="kawaii-cheek"></span>
+                    <span class="kawaii-cheek"></span>
+                  </div>
+                  <div class="kawaii-mouth"></div>
+                </div>
+              </div>
+              <div id="heroTinesRow" class="tines-row"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           ABA 2: BIBLIOTECA DE MÚSICAS (SALVA NO BANCO DE DADOS LOCAL)
+           ========================================================= -->
+      <section id="view-library" class="view-section scrollable-view">
+        <div class="library-container">
+          <div class="library-header-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+              <div>
+                <h2 style="font-size:17px;font-weight:900;color:var(--text-main);">Biblioteca de Músicas</h2>
+                <p id="libraryDbStatus" style="font-size:11px;font-weight:700;color:var(--text-muted);">
+                  Banco de dados local ativo (IndexedDB + LocalStorage) — Suas músicas e favoritos ficam salvos permanentemente.
+                </p>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button id="btnNewSongFromLib" class="clean-btn primary">Criar Nova Música</button>
+              </div>
+            </div>
+
+            <div class="library-search-row">
+              <input id="librarySearchInput" class="library-search-input" type="text" placeholder="Pesquisar por título ou artista..." />
+            </div>
+
+            <div id="libraryCategories" class="library-categories">
+              <button class="cat-pill active" data-cat="ALL">Todas</button>
+              <button class="cat-pill" data-cat="FAV">Favoritas</button>
+              <button class="cat-pill" data-cat="CUSTOM">Minhas Músicas</button>
+              <button class="cat-pill" data-cat="Anime & Ghibli">Anime & Ghibli</button>
+              <button class="cat-pill" data-cat="Games">Games</button>
+              <button class="cat-pill" data-cat="Pop & Filmes">Pop & Filmes</button>
+              <button class="cat-pill" data-cat="Clássicas & Fáceis">Clássicas & Fáceis</button>
+            </div>
+          </div>
+
+          <div id="librarySongsGrid" class="songs-grid"></div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           ABA 3: MODO CIFRA & KTAB VERTICAL
+           ========================================================= -->
+      <section id="view-cifra" class="view-section">
+        <div class="tiles-hud-bar">
+          <div class="tiles-transport-group">
+            <select id="cifraSongSelect" class="clean-select"></select>
+            <button id="btnToggleCifraFormat" class="clean-btn">Ver KTab Vertical</button>
+            <button id="btnAutoScroll" class="clean-btn">Auto-Rolagem</button>
+          </div>
+          <button id="btnOpenInHero" class="clean-btn primary">Praticar em Tiles</button>
+        </div>
+
+        <div id="cifraScrollContainer" class="cifra-body">
+          <div class="cifra-card">
+            <div style="border-bottom:1px solid var(--border-soft);padding-bottom:10px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+              <div>
+                <h2 id="cifraSongTitle" style="font-size:18px;font-weight:900;color:var(--primary);"></h2>
+                <p id="cifraSongMeta" style="font-size:12px;font-weight:700;color:var(--text-muted);"></p>
+              </div>
+              <span style="font-size:11px;font-weight:700;color:var(--text-muted);">Toque em qualquer nota para ouvir e localizar a lâmina abaixo</span>
+            </div>
+            <div id="cifraContentArea"></div>
+          </div>
+        </div>
+
+        <div class="kalimba-board mini-kalimba-drawer">
+          <div id="cifraMiniTinesRow" class="tines-row"></div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           ABA 4: MODO KALIMBA LIVRE (ESTILO KEYLIMBA TELA CHEIA)
+           ========================================================= -->
+      <section id="view-free" class="view-section">
+        <div class="tiles-hud-bar">
+          <span id="freeRecordStatus" style="font-size:12px;font-weight:800;color:var(--text-muted);">
+            Deslize os polegares pelas lâminas para tocar livremente
+          </span>
+          <div class="tiles-transport-group">
+            <button id="btnFreeRecord" class="clean-btn">Gravar</button>
+            <button id="btnSendRecordToEditor" class="clean-btn primary">Usar no Criador</button>
+          </div>
+        </div>
+
+        <div class="hero-stage">
+          <div class="aligned-stage-column">
+            <div class="kalimba-board full-kalimba">
+              <div class="soundhole" style="width:96px;height:96px;bottom:28px;">
+                <div class="kawaii-face" style="transform:scale(1.15);">
+                  <div class="kawaii-eyes">
+                    <span class="kawaii-eye"></span>
+                    <span class="kawaii-eye"></span>
+                  </div>
+                  <div class="kawaii-cheeks">
+                    <span class="kawaii-cheek"></span>
+                    <span class="kawaii-cheek"></span>
+                  </div>
+                  <div class="kawaii-mouth"></div>
+                </div>
+              </div>
+              <div id="freeTinesRow" class="tines-row"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           ABA 5: CRIADOR DE MÚSICAS + IMPORTADOR MIDI (.MID)
+           ========================================================= -->
+      <section id="view-editor" class="view-section scrollable-view">
+        <div class="editor-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <div>
+              <h2 style="font-size:16px;font-weight:900;color:var(--text-main);">Criador de Músicas</h2>
+              <p style="font-size:12px;font-weight:700;color:var(--text-muted);">Toque nas teclas abaixo, digite a cifra ou importe um arquivo MIDI (.mid). Fica salvo automaticamente na sua Biblioteca.</p>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <label class="clean-btn" style="cursor:pointer;">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span>Importar MIDI (.mid)</span>
+                <input id="inputMidiFile" type="file" accept=".mid,.midi,.json,.txt" style="display:none;" />
+              </label>
+              <button id="btnLoadCurrentIntoEditor" class="clean-btn">Editar Música Atual</button>
+              <button id="btnExportSongJson" class="clean-btn">Exportar</button>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Título</label>
+              <input id="editorTitle" class="form-input" type="text" placeholder="Nome da música" />
+            </div>
+            <div class="form-group">
+              <label>Artista</label>
+              <input id="editorArtist" class="form-input" type="text" placeholder="Autor" />
+            </div>
+            <div class="form-group">
+              <label>Andamento (BPM)</label>
+              <input id="editorBpm" class="form-input" type="number" value="96" min="40" max="220" />
+            </div>
+            <div class="form-group">
+              <label>Teclas de Referência</label>
+              <select id="editorMinKeys" class="form-input">
+                <option value="8">8 Teclas</option>
+                <option value="10">10 Teclas</option>
+                <option value="17" selected>17 Teclas (Padrão)</option>
+                <option value="21">21 Teclas</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:4px;">
+              <label>Toque nas lâminas para inserir notas:</label>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
+                <button type="button" class="clean-btn dur-btn" data-dur="0.5">Curta (1/2)</button>
+                <button type="button" class="clean-btn dur-btn active" data-dur="1">Normal (1t)</button>
+                <button type="button" class="clean-btn dur-btn" data-dur="2">Longa (2t)</button>
+                <button type="button" id="btnToggleChordMode" class="clean-btn">Montar Acorde</button>
+                <button type="button" id="btnInsertChord" class="clean-btn primary" style="display:none;">Inserir Acorde</button>
+                <button type="button" id="btnInsertBar" class="clean-btn">| Compasso</button>
+                <button type="button" id="btnInsertRest" class="clean-btn">- Pausa</button>
+              </div>
+            </div>
+
+            <div id="editorQuickPicker" class="quick-tine-picker"></div>
+
+            <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+              <input id="editorNoteLyric" class="form-input" style="max-width:200px;padding:5px 10px;font-size:12px;" type="text" placeholder="Sílaba opcional" />
+              <span id="editorNoteCountBadge" style="font-size:11px;color:var(--primary);font-weight:800;margin-left:auto;">0 notas</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Sequência da Cifra (números 1 2° 3°° ou notas C D° E°° e acordes entre parênteses):</label>
+            <textarea id="editorTabTextarea" class="form-textarea" placeholder="3 3 4 5 | 5 4 3 2 | 1 1 2 3 | (1 3 5)*2"></textarea>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;">
+            <button id="btnCopyForGithub" class="clean-btn" title="Copia o código pronto para enviar ao catálogo oficial no GitHub">Copiar Código p/ GitHub</button>
+            <button id="btnTestInHero" class="clean-btn">Testar em Tiles</button>
+            <button id="btnSaveSong" class="clean-btn primary">Salvar na Biblioteca</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="./js/songs-catalog.js"></script>
+  <script src="./js/kalimba-config.js"></script>
+  <script src="./js/db.js"></script>
+  <script src="./js/audio-engine.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

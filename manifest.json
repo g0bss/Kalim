@@ -1,0 +1,17 @@
+{
+  "name": "Kalim — Kalimba Hero & Cifras",
+  "short_name": "Kalim",
+  "description": "Aprenda, toque e crie músicas na Kalimba com visual minimalista estilo Keylimba e Piano Tiles.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff7ed",
+  "theme_color": "#fb923c",
+  "icons": [
+    {
+      "src": "./assets/kalim-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
