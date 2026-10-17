@@ -77,7 +77,7 @@
     tuningId: "C_MAJOR",
     labelMode: "both",
     kalimbaWidthPct: 100,
-    kalimbaHeightPct: 42,
+    kalimbaHeightPct: 34,
     layout: [],
     degreeToKeyMap: {},
 
@@ -93,7 +93,7 @@
 
     // Playback Tiles
     isPlaying: false,
-    currentBeat: -2,
+    currentBeat: -5,
     speed: 1.0,
     playStyle: "wait", // "wait" | "flow"
     guideAudioInFlow: true,
@@ -170,7 +170,7 @@
   }
 
   function applyKalimbaHeight(pct) {
-    const clamped = Math.max(25, Math.min(55, Number(pct) || 42));
+    const clamped = Math.max(25, Math.min(55, Number(pct) || 34));
     state.kalimbaHeightPct = clamped;
     const appEl = document.getElementById("app");
     if (appEl) {
@@ -190,7 +190,7 @@
       if (saved.tuningId && window.KalimbaData.TUNINGS[saved.tuningId]) state.tuningId = saved.tuningId;
       if (saved.labelMode) state.labelMode = saved.labelMode;
       if (saved.kalimbaWidthPct) state.kalimbaWidthPct = saved.kalimbaWidthPct;
-      if (saved.kalimbaHeightPct) state.kalimbaHeightPct = saved.kalimbaHeightPct;
+      if (saved.kalimbaHeightPct && saved.kalimbaHeightPct !== 42) state.kalimbaHeightPct = saved.kalimbaHeightPct;
       if (saved.currentSongId) state.currentSongId = saved.currentSongId;
     } catch (e) {}
 
@@ -565,6 +565,7 @@
 
     container.ontouchstart = (e) => {
       e.preventDefault();
+      window.KalimbaAudio.initContext();
       for (let i = 0; i < e.changedTouches.length; i++) {
         const t = e.changedTouches[i];
         const el = document.elementFromPoint(t.clientX, t.clientY);
@@ -593,6 +594,7 @@
     };
 
     container.ontouchend = (e) => {
+      window.KalimbaAudio.initContext();
       for (let i = 0; i < e.changedTouches.length; i++) {
         activeTouchKeys.delete(e.changedTouches[i].identifier);
       }
@@ -697,6 +699,8 @@
 
   function evaluateHeroUserHit(degreeId) {
     if (!state.currentSong) return;
+    // Durante os 3 segundos iniciais de preparação, tocar uma lâmina não quebra o combo
+    if (state.currentBeat < -0.45) return;
 
     const keyObj = state.degreeToKeyMap[degreeId];
     const pal = THEME_PALETTES[state.theme] || THEME_PALETTES.peach;
@@ -800,9 +804,16 @@
     return last.beat + (last.duration || 1);
   }
 
+  // Calcula exatamente 3 segundos de preparação (lead-in) antes da primeira nota chegar na linha
+  function getPrepLeadInBeats() {
+    const bpm = ((state.currentSong && state.currentSong.bpm) || 100) * state.speed;
+    const beatsPerSec = bpm / 60;
+    return Math.max(2.5, beatsPerSec * 3.0);
+  }
+
   function resetPlayback() {
     state.isPlaying = false;
-    state.currentBeat = -1.5;
+    state.currentBeat = -getPrepLeadInBeats();
     state.score = 0;
     state.combo = 0;
     state.triggeredEventIndices.clear();
@@ -820,6 +831,9 @@
     if (state.currentBeat >= total + 1) {
       resetPlayback();
     }
+    if (!state.isPlaying && state.currentBeat <= 0.05) {
+      state.currentBeat = -getPrepLeadInBeats();
+    }
     state.isPlaying = !state.isPlaying;
     lastFrameTime = performance.now();
     updatePlayPauseButton();
@@ -833,6 +847,10 @@
       icon.innerHTML = state.isPlaying
         ? '<rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/>'
         : '<polygon points="5 3 19 12 5 21 5 3" fill="currentColor"/>';
+    }
+    const appEl = document.getElementById("app");
+    if (appEl) {
+      appEl.classList.toggle("is-playing-tiles", state.isPlaying && state.activeTab === "hero");
     }
   }
 
@@ -1043,8 +1061,8 @@
 
     const pal = THEME_PALETTES[state.theme] || THEME_PALETTES.peach;
     const laneW = W / numKeys;
-    const hitLineY = H - 12;
-    const visibleBeatsAhead = 5.2;
+    const hitLineY = H - 10;
+    const visibleBeatsAhead = Math.max(6.8, getPrepLeadInBeats() + 1.2);
     const pixelsPerBeat = hitLineY / visibleBeatsAhead;
 
     state.layout.forEach((keyObj, idx) => {
@@ -1100,7 +1118,7 @@
         ctx.globalAlpha = isDone ? 0.25 : 1.0;
 
         const noteBottomY = hitLineY - beatDiff * pixelsPerBeat;
-        const tileHeight = Math.max(32, Math.min(ev.duration * pixelsPerBeat * 0.72, 125));
+        const tileHeight = Math.max(28, Math.min(ev.duration * pixelsPerBeat * 0.72, 110));
         const tileTopY = noteBottomY - tileHeight;
 
         const validKeys = ev.degrees.map(d => state.degreeToKeyMap[d]).filter(Boolean);
@@ -1114,19 +1132,19 @@
           ctx.strokeStyle = pal.hitLine;
           ctx.lineWidth = 3;
           ctx.beginPath();
-          ctx.moveTo(startX, noteBottomY - 16);
-          ctx.lineTo(endX, noteBottomY - 16);
+          ctx.moveTo(startX, noteBottomY - 14);
+          ctx.lineTo(endX, noteBottomY - 14);
           ctx.stroke();
         }
 
         validKeys.forEach(keyObj => {
           const xCenter = (keyObj.visualIndex + 0.5) * laneW;
-          const boxW = Math.min(40, laneW * 0.86);
+          const boxW = Math.min(38, laneW * 0.86);
           const boxX = xCenter - boxW / 2;
           const color = getOctaveColor(keyObj.octaveOffset);
 
           ctx.fillStyle = color;
-          roundRect(ctx, boxX, tileTopY, boxW, tileHeight, 10);
+          roundRect(ctx, boxX, tileTopY, boxW, tileHeight, 9);
           ctx.fill();
 
           const lbl = state.labelMode === "letter" ? keyObj.letterLabel : keyObj.degreeLabel;
@@ -1134,11 +1152,37 @@
           ctx.font = `900 ${boxW < 22 ? 10 : 12}px 'Nunito', sans-serif`;
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
-          ctx.fillText(lbl, xCenter, noteBottomY - 16);
+          ctx.fillText(lbl, xCenter, noteBottomY - 14);
         });
 
         ctx.globalAlpha = 1.0;
       });
+    }
+
+    // Contagem regressiva visual durante os 3 segundos de preparação antes da música começar
+    if (state.isPlaying && state.currentBeat < -0.05) {
+      const bpm = ((state.currentSong && state.currentSong.bpm) || 100) * state.speed;
+      const beatsPerSec = bpm / 60;
+      const secsRemaining = Math.max(1, Math.ceil(Math.abs(state.currentBeat) / beatsPerSec));
+
+      ctx.save();
+      const pillW = 170;
+      const pillH = 38;
+      const pillX = (W - pillW) / 2;
+      const pillY = Math.max(40, H * 0.5 - pillH / 2);
+
+      ctx.fillStyle = pal.hitLine;
+      ctx.globalAlpha = 0.92;
+      roundRect(ctx, pillX, pillY, pillW, pillH, 19);
+      ctx.fill();
+
+      ctx.globalAlpha = 1.0;
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 15px 'Nunito', sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(`Prepare-se: ${secsRemaining}s`, W / 2, pillY + pillH / 2);
+      ctx.restore();
     }
 
     for (let i = state.particles.length - 1; i >= 0; i--) {

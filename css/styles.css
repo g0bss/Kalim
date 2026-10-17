@@ -420,27 +420,58 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 14px;
+  padding: 5px 12px;
   background: var(--bg-highway);
   border-bottom: 1px solid var(--border-soft);
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
   flex-shrink: 0;
+  transition: padding 0.18s ease;
+}
+
+.tiles-hud-bar::-webkit-scrollbar {
+  display: none;
 }
 
 .tiles-transport-group {
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
 }
 
 .combo-display {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 13px;
+  gap: 8px;
+  font-size: 12px;
   font-weight: 900;
+  flex-shrink: 0;
+}
+
+/* MODO IMERSIVO AO COMEÇAR A TOCAR: Mais área de previsão para as notas! */
+#app.is-playing-tiles .floating-topbar {
+  display: none;
+}
+
+#app.is-playing-tiles .tiles-hud-bar {
+  padding: 3px 10px;
+}
+
+#app.is-playing-tiles #heroSongSelect,
+#app.is-playing-tiles #selectPlayStyle,
+#app.is-playing-tiles #selectSpeed,
+#app.is-playing-tiles #btnGuideAudio,
+#app.is-playing-tiles #btnLoopSection {
+  display: none;
+}
+
+#app.is-playing-tiles .kalimba-board:not(.full-kalimba) {
+  height: min(var(--kalimba-height, 34%), 31dvh);
+  min-height: 88px;
 }
 
 .combo-pill {
@@ -513,15 +544,15 @@ html, body {
 
 .floating-lyric-banner {
   position: absolute;
-  top: 10px;
+  top: 8px;
   left: 50%;
   transform: translateX(-50%);
   background: var(--bg-surface);
   backdrop-filter: blur(6px);
   border: 1px solid var(--border-soft);
-  padding: 4px 14px;
+  padding: 3px 12px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 800;
   color: var(--text-main);
   pointer-events: none;
@@ -553,8 +584,8 @@ html, body {
 
 /* CORPO KEYLIMBA */
 .kalimba-board {
-  height: var(--kalimba-height, 42%);
-  min-height: 125px;
+  height: var(--kalimba-height, 34%);
+  min-height: 96px;
   width: 100%;
   background: var(--bg-main);
   border-top: 2px solid var(--border-soft);
@@ -562,7 +593,7 @@ html, body {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  transition: height 0.12s ease;
+  transition: height 0.16s ease;
 }
 
 .kalimba-board.full-kalimba {
@@ -1122,3 +1153,22 @@ html, body {
   .mode-tab span { display: none; }
   .brand-title { font-size: 15px; }
 }
+
+@media (max-height: 520px) {
+  .floating-topbar {
+    padding: 4px 10px;
+  }
+  .tiles-hud-bar {
+    padding: 3px 10px;
+  }
+  .kalimba-board:not(.full-kalimba) {
+    height: min(var(--kalimba-height, 34%), 32dvh);
+    min-height: 85px;
+  }
+  .soundhole {
+    width: 52px;
+    height: 52px;
+    bottom: 6px;
+  }
+}
+
