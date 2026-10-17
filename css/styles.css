@@ -484,6 +484,25 @@ html, body {
   width: 100%;
   background: var(--bg-highway);
   overflow: hidden;
+  cursor: pointer;
+}
+
+.highway-progress-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--border-soft);
+  z-index: 15;
+  pointer-events: none;
+}
+
+.highway-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--primary);
+  transition: width 0.1s linear;
 }
 
 #heroCanvas {
@@ -534,8 +553,8 @@ html, body {
 
 /* CORPO KEYLIMBA */
 .kalimba-board {
-  height: 44%;
-  min-height: 175px;
+  height: var(--kalimba-height, 42%);
+  min-height: 125px;
   width: 100%;
   background: var(--bg-main);
   border-top: 2px solid var(--border-soft);
@@ -543,6 +562,7 @@ html, body {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  transition: height 0.12s ease;
 }
 
 .kalimba-board.full-kalimba {

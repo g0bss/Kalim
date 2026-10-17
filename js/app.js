@@ -77,22 +77,26 @@
     tuningId: "C_MAJOR",
     labelMode: "both",
     kalimbaWidthPct: 100,
+    kalimbaHeightPct: 42,
     layout: [],
     degreeToKeyMap: {},
 
     songs: [],
-    currentSongId: "avatars-love",
+    currentSongId: "no-surprises",
     currentSong: null,
 
     // Filtros da Biblioteca
     libraryCategory: "ALL",
     librarySearch: "",
+    previewingSongId: null,
+    previewTimers: [],
 
     // Playback Tiles
     isPlaying: false,
     currentBeat: -2,
     speed: 1.0,
     playStyle: "wait", // "wait" | "flow"
+    guideAudioInFlow: true,
     loopEnabled: false,
     loopStartBeat: 0,
     loopEndBeat: 16,
@@ -133,6 +137,7 @@
     loadPreferences();
     applyTheme(state.theme);
     applyKalimbaWidth(state.kalimbaWidthPct);
+    applyKalimbaHeight(state.kalimbaHeightPct);
     await loadSongsFromDatabase();
     rebuildKalimbaLayout();
     selectSong(state.currentSongId);
@@ -164,6 +169,19 @@
     if (slider) slider.value = clamped;
   }
 
+  function applyKalimbaHeight(pct) {
+    const clamped = Math.max(25, Math.min(55, Number(pct) || 42));
+    state.kalimbaHeightPct = clamped;
+    const appEl = document.getElementById("app");
+    if (appEl) {
+      appEl.style.setProperty("--kalimba-height", `${clamped}%`);
+    }
+    const lbl = document.getElementById("heightPctLabel");
+    if (lbl) lbl.textContent = `${clamped}%`;
+    const slider = document.getElementById("sliderKalimbaHeight");
+    if (slider) slider.value = clamped;
+  }
+
   function loadPreferences() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY_PREFS) || "{}");
@@ -172,6 +190,7 @@
       if (saved.tuningId && window.KalimbaData.TUNINGS[saved.tuningId]) state.tuningId = saved.tuningId;
       if (saved.labelMode) state.labelMode = saved.labelMode;
       if (saved.kalimbaWidthPct) state.kalimbaWidthPct = saved.kalimbaWidthPct;
+      if (saved.kalimbaHeightPct) state.kalimbaHeightPct = saved.kalimbaHeightPct;
       if (saved.currentSongId) state.currentSongId = saved.currentSongId;
     } catch (e) {}
 
@@ -188,6 +207,7 @@
         tuningId: state.tuningId,
         labelMode: state.labelMode,
         kalimbaWidthPct: state.kalimbaWidthPct,
+        kalimbaHeightPct: state.kalimbaHeightPct,
         currentSongId: state.currentSongId
       }));
     } catch (e) {}
@@ -353,16 +373,26 @@
       btnPlayTiles.style.flex = "1";
       btnPlayTiles.textContent = "Tocar em Tiles";
       btnPlayTiles.onclick = () => {
+        stopLibraryPreview();
         selectSong(song.id);
         switchTab("hero");
         resetPlayback();
         togglePlayPause();
       };
 
+      const isPrev = state.previewingSongId === song.id;
+      const btnPreview = document.createElement("button");
+      btnPreview.className = "clean-btn" + (isPrev ? " active" : "");
+      btnPreview.textContent = isPrev ? "Parar" : "Ouvir";
+      btnPreview.onclick = () => {
+        togglePreviewSong(song);
+      };
+
       const btnViewCifra = document.createElement("button");
       btnViewCifra.className = "clean-btn";
       btnViewCifra.textContent = "Cifra";
       btnViewCifra.onclick = () => {
+        stopLibraryPreview();
         selectSong(song.id);
         switchTab("cifra");
       };
@@ -371,12 +401,14 @@
       btnEdit.className = "clean-btn";
       btnEdit.textContent = "Editar";
       btnEdit.onclick = () => {
+        stopLibraryPreview();
         selectSong(song.id);
         loadSongIntoEditorForm(song);
         switchTab("editor");
       };
 
       actions.appendChild(btnPlayTiles);
+      actions.appendChild(btnPreview);
       actions.appendChild(btnViewCifra);
       actions.appendChild(btnEdit);
 
@@ -385,6 +417,7 @@
         btnDel.className = "clean-btn danger";
         btnDel.textContent = "Excluir";
         btnDel.onclick = async () => {
+          stopLibraryPreview();
           await window.KalimDB.deleteCustomSong(song.id);
           await loadSongsFromDatabase();
           if (state.currentSongId === song.id) {
@@ -397,6 +430,43 @@
       card.appendChild(actions);
       grid.appendChild(card);
     });
+  }
+
+  function stopLibraryPreview() {
+    state.previewTimers.forEach(t => clearTimeout(t));
+    state.previewTimers = [];
+    state.previewingSongId = null;
+  }
+
+  function togglePreviewSong(song) {
+    if (state.previewingSongId === song.id) {
+      stopLibraryPreview();
+      renderLibraryView();
+      return;
+    }
+    stopLibraryPreview();
+    window.KalimbaAudio.initContext();
+    state.previewingSongId = song.id;
+    renderLibraryView();
+
+    const bpm = song.bpm || 96;
+    const msPerBeat = (60 / bpm) * 1000;
+    const previewEvents = (song.events || []).slice(0, 16);
+
+    previewEvents.forEach((ev) => {
+      const timer = setTimeout(() => {
+        const freqs = ev.degrees.map(d => state.degreeToKeyMap[d]?.freq).filter(Boolean);
+        window.KalimbaAudio.playChord(freqs, 0.85, 16);
+      }, ev.beat * msPerBeat);
+      state.previewTimers.push(timer);
+    });
+
+    const lastBeat = previewEvents.length ? previewEvents[previewEvents.length - 1].beat + 2 : 1;
+    const endTimer = setTimeout(() => {
+      state.previewingSongId = null;
+      renderLibraryView();
+    }, lastBeat * msPerBeat);
+    state.previewTimers.push(endTimer);
   }
 
   function rebuildKalimbaLayout() {
@@ -770,14 +840,20 @@
     const scoreEl = document.getElementById("hudScore");
     const comboEl = document.getElementById("hudCombo");
     const slider = document.getElementById("progressSlider");
+    const topFill = document.getElementById("topProgressFill");
 
     if (scoreEl) scoreEl.textContent = `${state.score} pts`;
     if (comboEl) comboEl.textContent = `Combo ${state.combo}x`;
 
     const total = getSongTotalBeats(state.currentSong);
+    const clampedBeat = Math.max(0, Math.min(total, state.currentBeat));
     if (slider) {
       slider.max = total;
-      slider.value = Math.max(0, Math.min(total, state.currentBeat));
+      slider.value = clampedBeat;
+    }
+    if (topFill) {
+      const pct = total > 0 ? Math.min(100, (clampedBeat / total) * 100) : 0;
+      topFill.style.width = `${pct.toFixed(1)}%`;
     }
   }
 
@@ -811,9 +887,16 @@
           const ev = events[i];
           if (!state.visualPulsedEventIndices.has(i) && nextBeat >= ev.beat) {
             state.visualPulsedEventIndices.add(i);
+            const guideFreqs = [];
             ev.degrees.forEach(degId => {
               triggerTineVisualPulse(degId, Math.max(180, (ev.duration / beatsPerSec) * 550));
+              if (state.guideAudioInFlow && state.degreeToKeyMap[degId]) {
+                guideFreqs.push(state.degreeToKeyMap[degId].freq);
+              }
             });
+            if (guideFreqs.length > 0) {
+              window.KalimbaAudio.playChord(guideFreqs, 0.55, 14);
+            }
           }
 
           if (
@@ -1330,6 +1413,14 @@
       savePreferences();
     };
 
+    const heightSlider = document.getElementById("sliderKalimbaHeight");
+    if (heightSlider) {
+      heightSlider.oninput = (e) => {
+        applyKalimbaHeight(e.target.value);
+        savePreferences();
+      };
+    }
+
     document.getElementById("btnFullscreen").onclick = () => {
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen?.();
@@ -1403,6 +1494,15 @@
       togglePlayPause();
     };
 
+    const highwayTapArea = document.getElementById("highwayTapArea");
+    if (highwayTapArea) {
+      highwayTapArea.onclick = (e) => {
+        if (e.target.closest("button, select, input")) return;
+        togglePlayPause();
+        showHitFeedback(state.isPlaying ? "Reproduzindo" : "Pausado");
+      };
+    }
+
     document.getElementById("selectSpeed").onchange = (e) => {
       state.speed = parseFloat(e.target.value) || 1.0;
     };
@@ -1411,6 +1511,16 @@
       state.playStyle = e.target.value;
       clearTargetCueTines();
     };
+
+    const btnGuideAudio = document.getElementById("btnGuideAudio");
+    if (btnGuideAudio) {
+      btnGuideAudio.onclick = (e) => {
+        state.guideAudioInFlow = !state.guideAudioInFlow;
+        e.currentTarget.classList.toggle("active", state.guideAudioInFlow);
+        savePreferences();
+        showHitFeedback(state.guideAudioInFlow ? "Som Guia: Ativo" : "Som Guia: Mudo");
+      };
+    }
 
     document.getElementById("btnLoopSection").onclick = (e) => {
       state.loopEnabled = !state.loopEnabled;

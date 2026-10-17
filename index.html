@@ -105,9 +105,14 @@
       </div>
 
       <div class="setting-row">
-        <label>Largura das Teclas na Tela (<span id="widthPctLabel">100%</span>)</label>
+        <label>Largura das Teclas (<span id="widthPctLabel">100%</span>)</label>
         <input id="sliderKalimbaWidth" type="range" min="65" max="100" value="100" style="accent-color:var(--primary);" />
-        <span style="font-size:10px;color:var(--text-muted);font-weight:700;">Ajuste para alinhar exatamente com as 17 teclas da sua Kalimba física abaixo do celular.</span>
+      </div>
+
+      <div class="setting-row">
+        <label>Altura das Lâminas (<span id="heightPctLabel">42%</span>)</label>
+        <input id="sliderKalimbaHeight" type="range" min="25" max="55" value="42" style="accent-color:var(--primary);" />
+        <span style="font-size:10px;color:var(--text-muted);font-weight:700;">Dica: Diminua para ~28% quando o celular estiver apoiado sobre a Kalimba física para ver mais notas caindo.</span>
       </div>
     </div>
 
@@ -143,6 +148,10 @@
               <option value="1.25">1.25x</option>
             </select>
 
+            <button id="btnGuideAudio" class="clean-btn active" title="Tocar som guia quando a nota passa no modo contínuo">
+              <span>Som Guia</span>
+            </button>
+
             <button id="btnLoopSection" class="clean-btn" title="Repetir Trecho (Loop)">
               <svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
               <span>Loop</span>
@@ -159,7 +168,8 @@
         <!-- PALCO ALINHADO DE PONTA A PONTA -->
         <div class="hero-stage">
           <div class="aligned-stage-column">
-            <div class="highway-container">
+            <div class="highway-container" id="highwayTapArea" title="Toque na pista para Pausar ou Continuar">
+              <div class="highway-progress-track"><div id="topProgressFill" class="highway-progress-fill"></div></div>
               <div id="floatingLyricBanner" class="floating-lyric-banner">Escolha uma música e toque em Iniciar</div>
               <div id="hitFeedback" class="hit-feedback">Perfeito</div>
               <canvas id="heroCanvas"></canvas>

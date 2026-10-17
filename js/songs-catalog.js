@@ -3,10 +3,76 @@
  *
  * Como contribuir com uma nova música pelo GitHub:
  * 1. Abra o aplicativo Kalim -> Aba "Criar" -> Monte ou importe sua música.
- * 2. Clique no botão "Copiar p/ GitHub" no rodapé do Criador.
- * 3. Cole o bloco gerado no final da lista COMMUNITY_SONGS abaixo e envie um Pull Request (ou abra uma Issue)!
+ * 2. Clique no botão "Copiar Código p/ GitHub" no rodapé do Criador.
+ * 3. Cole o bloco gerado no final da lista KALIM_COMMUNITY_SONGS abaixo e envie um Pull Request (ou abra uma Issue)!
  */
 window.KALIM_COMMUNITY_SONGS = [
+  {
+    id: "no-surprises",
+    title: "No Surprises",
+    artist: "Radiohead",
+    difficulty: "Iniciante",
+    minKeys: 17,
+    bpm: 76,
+    category: "Pop & Filmes",
+    description: "O famoso riff de arpejo cristalino do Radiohead seguido pela melodia principal. Soa idêntico ao original na Kalimba!",
+    tabText: [
+      "(1 6) 1' 3' 1' | 6 1' 3' 1' | (1 6) 1' 3' 1' | (2 7) 5 7 2' |",
+      "(1 6) 1' 3' 1' | 6 1' 3' 1' | (1 6) 1' 3' 1' | (2 7) 5 7 2' |",
+      "6:A 6:heart 5:that's 4:full | 3:up 2:like 1:a 2:land- 4*2:fill |",
+      "6:A 6:job 5:that 4:slow- | 3:ly 2:kills 1:you 2*2 |",
+      "6:Brui- 6:ses 5:that 4:won't | 3:heal 2 1 2 4*2 |",
+      "(4 6)*2:No (5 7):sur- (1 3 6)*2:pri-ses | (4 6)*2:please (5 7) (1 3 5 1')*3"
+    ].join("\n")
+  },
+  {
+    id: "in-the-pool-csm",
+    title: "In the Pool (Chainsaw Man)",
+    artist: "Kensuke Ushio",
+    difficulty: "Intermediário",
+    minKeys: 17,
+    bpm: 84,
+    category: "Anime & Ghibli",
+    description: "Trilha delicada e melancólica de Chainsaw Man (Arco da Reze), alternando notas graves de apoio e melodia aguda.",
+    tabText: [
+      "(1 5) 1' 2' 3'*2 | (4 6) 1' 2' 1'*2 | (2 6) 1' 7 5*2 | (1 3 5) 5 1' 3'*2 |",
+      "(1 5) 3' 5' 3'*2 | (4 6) 2' 3' 1'*2 | (2 6) 1' 7 6 7 | (1 3 5 1')*4 |",
+      "6 1' 3' 6' 5'*2 | 4 6 1' 4' 3'*2 | 2 5 7 2' 1' 7 | (1 3 5) 5 1' 3'*2 |",
+      "(4 6 1')*2 7 5 | (3 5 7)*2 6 3 | (2 4 6)*2 5 7 | (1 3 5 1')*4"
+    ].join("\n")
+  },
+  {
+    id: "city-of-stars",
+    title: "City of Stars (La La Land)",
+    artist: "Justin Hurwitz",
+    difficulty: "Intermediário",
+    minKeys: 17,
+    bpm: 90,
+    category: "Pop & Filmes",
+    description: "Tema principal de La La Land com balanço suave e melodia nostálgica.",
+    tabText: [
+      "3 5 6 1'*2 | 2' 1' 7 6 5*2 | 4 5 6 1' 7 5 | 3*4 |",
+      "3 5 6 1'*2 | 2' 3' 2' 1' 6*2 | 4 6 1' 3' 2' 1' | (5 7 2')*4 |",
+      "(6 1'):Ci- 1':ty 7:of 6:stars | (4 6):are 6:you 5:shi- 4:ning | (1 3):just 3:for (2 5)*2:me |",
+      "(6 1'):Ci- 1':ty 7:of 6:stars | (4 6):you 1':ne- 7:ver 6:shined | 5:so (1 3 6)*3:bright"
+    ].join("\n")
+  },
+  {
+    id: "mia-and-sebastian",
+    title: "Mia & Sebastian's Theme (La La Land)",
+    artist: "Justin Hurwitz",
+    difficulty: "Intermediário",
+    minKeys: 17,
+    bpm: 82,
+    category: "Pop & Filmes",
+    description: "A famosa melodia de piano solo de La La Land adaptada para as 17 teclas da Kalimba.",
+    tabText: [
+      "5 1' 7 1' 7 1' | 6*2 3*2 | 4 7 6 7 6 7 | 5*2 2*2 |",
+      "3 6 5 6 5 6 | 4*2 2*2 | 5 4 3 2 1 7_ | (1 3 6)*4 |",
+      "(6 1') 3' 2' 3' 2' 3' | (4 1')*2 6*2 | (2 7) 2' 1' 2' 1' 2' | (3 7)*2 5*2 |",
+      "(6 1') 3' 5' 3' 2' 1' | (2 6) 2' 1' 7 6 5 | (1 3 6)*4"
+    ].join("\n")
+  },
   {
     id: "avatars-love",
     title: "Avatar's Love",
