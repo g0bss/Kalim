@@ -254,6 +254,13 @@ window.KalimbaData = (function () {
 
         let duration = 1;
         let coreToken = token;
+        let lyric = "";
+
+        if (coreToken.includes(":")) {
+          const parts = coreToken.split(":");
+          coreToken = parts[0];
+          lyric = parts.slice(1).join(":");
+        }
 
         const durMultMatch = coreToken.match(/^(.*)\*(\d+(?:\.\d+)?)$/);
         const durDivMatch = coreToken.match(/^(.*)\/(\d+(?:\.\d+)?)$/);
@@ -264,13 +271,6 @@ window.KalimbaData = (function () {
           coreToken = durDivMatch[1];
           const div = parseFloat(durDivMatch[2]) || 1;
           duration = 1 / div;
-        }
-
-        let lyric = "";
-        if (coreToken.includes(":")) {
-          const parts = coreToken.split(":");
-          coreToken = parts[0];
-          lyric = parts.slice(1).join(":");
         }
 
         let degrees = [];

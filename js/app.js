@@ -449,14 +449,14 @@
     state.previewingSongId = song.id;
     renderLibraryView();
 
-    const bpm = song.bpm || 96;
+    const bpm = (song.bpm || 140) * (state.speed || 1.0);
     const msPerBeat = (60 / bpm) * 1000;
-    const previewEvents = (song.events || []).slice(0, 16);
+    const previewEvents = (song.events || []).slice(0, 24);
 
     previewEvents.forEach((ev) => {
       const timer = setTimeout(() => {
         const freqs = ev.degrees.map(d => state.degreeToKeyMap[d]?.freq).filter(Boolean);
-        window.KalimbaAudio.playChord(freqs, 0.85, 16);
+        window.KalimbaAudio.playChord(freqs, 0.9, 14);
       }, ev.beat * msPerBeat);
       state.previewTimers.push(timer);
     });
