@@ -1152,6 +1152,20 @@ html, body {
   .tines-row { gap: 2px; padding: 0 1px; }
   .mode-tab span { display: none; }
   .brand-title { font-size: 15px; }
+  #heroSongSelect {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .tiles-hud-bar {
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 5px 8px;
+  }
+  .tiles-transport-group {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
 }
 
 @media (max-height: 520px) {
