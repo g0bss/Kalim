@@ -1489,6 +1489,82 @@
   }
 
   function bindUIEvents() {
+    const splashEl = document.getElementById("welcomeSplashScreen");
+    const mascotEl = document.getElementById("splashBearMascot");
+    if (splashEl) {
+      let isEnteringApp = false;
+
+      const updateMascotLookAt = (clientX, clientY) => {
+        if (!mascotEl || isEnteringApp || splashEl.classList.contains("dismissed")) return;
+        const rect = mascotEl.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const dx = clientX - centerX;
+        const dy = clientY - centerY;
+        const maxDist = Math.max(window.innerWidth, window.innerHeight) * 0.42;
+        const normX = Math.max(-1, Math.min(1, dx / maxDist));
+        const normY = Math.max(-1, Math.min(1, dy / maxDist));
+
+        const lookX = (normX * 12).toFixed(2) + "px";
+        const lookY = (normY * 10).toFixed(2) + "px";
+        const tiltDeg = (normX * 7).toFixed(2) + "deg";
+
+        mascotEl.style.setProperty("--look-x", lookX);
+        mascotEl.style.setProperty("--look-y", lookY);
+        mascotEl.style.setProperty("--tilt-deg", tiltDeg);
+      };
+
+      const triggerMascotSmileAndEnter = () => {
+        if (isEnteringApp || splashEl.classList.contains("dismissed")) return;
+        isEnteringApp = true;
+
+        window.KalimbaAudio.initContext();
+        // Toca um acorde de boas-vindas suave na Kalimba real (Dó - Mi - Sol agudos)
+        window.KalimbaAudio.playChord([523.25, 659.25, 783.99], 0.85, 85);
+
+        if (mascotEl) {
+          mascotEl.style.setProperty("--look-x", "0px");
+          mascotEl.style.setProperty("--look-y", "-2px");
+          mascotEl.style.setProperty("--tilt-deg", "0deg");
+          mascotEl.classList.add("smiling-enter");
+        }
+
+        setTimeout(() => {
+          splashEl.classList.add("dismissed");
+        }, 480);
+      };
+
+      // Computador: acompanha o cursor do mouse em tempo real e sorri ao clicar
+      splashEl.addEventListener("mousemove", (e) => {
+        updateMascotLookAt(e.clientX, e.clientY);
+      });
+
+      splashEl.addEventListener("click", () => {
+        triggerMascotSmileAndEnter();
+      });
+
+      // Celular: se tocar e arrastar o dedo, acompanha o toque; ao soltar (ou clicar rápido), dá o sorrisinho e entra
+      splashEl.addEventListener("touchstart", (e) => {
+        if (e.touches && e.touches.length > 0) {
+          // Desbloqueia o WebAudio do iOS imediatamente no primeiro toque
+          window.KalimbaAudio.initContext();
+          updateMascotLookAt(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: true });
+
+      splashEl.addEventListener("touchmove", (e) => {
+        if (e.touches && e.touches.length > 0) {
+          e.preventDefault();
+          updateMascotLookAt(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: false });
+
+      splashEl.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        triggerMascotSmileAndEnter();
+      });
+    }
+
     const settingsBtn = document.getElementById("btnSettingsToggle");
     const settingsPop = document.getElementById("settingsPopover");
     settingsBtn.onclick = (e) => {

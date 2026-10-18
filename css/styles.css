@@ -603,23 +603,24 @@ html, body {
 
 .soundhole {
   position: absolute;
-  bottom: 14px;
+  bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
-  width: 74px;
-  height: 74px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
-  background: var(--soundhole-bg);
+  background: #ffffff;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.10);
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
   z-index: 1;
-  transition: transform 0.14s ease;
+  transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .soundhole.bounce {
-  transform: translateX(-50%) scale(1.07);
+  transform: translateX(-50%) scale(1.09) rotate(-4deg);
 }
 
 .kawaii-face {
@@ -627,8 +628,9 @@ html, body {
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  color: var(--soundhole-face);
+  color: #3b2822;
   user-select: none;
+  transition: transform 0.08s ease-out;
 }
 
 .kawaii-eyes {
@@ -638,41 +640,54 @@ html, body {
 }
 
 .kawaii-eye {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: var(--soundhole-face);
+  background: #3b2822;
+  animation: kawaiiBlink 4.2s infinite ease-in-out;
+  transition: all 0.12s ease;
+}
+
+@keyframes kawaiiBlink {
+  0%, 93%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.15); }
 }
 
 .kawaii-cheeks {
   display: flex;
   align-items: center;
   gap: 24px;
-  margin-top: -4px;
+  margin-top: -3px;
 }
 
 .kawaii-cheek {
-  width: 9px;
-  height: 4px;
+  width: 10px;
+  height: 5.5px;
   border-radius: 50%;
-  background: #e56b6f;
-  opacity: 0.45;
+  background: #ff85a2;
+  opacity: 0.88;
+  transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
 .kawaii-mouth {
-  width: 10px;
-  height: 5px;
-  border-bottom: 2.2px solid var(--soundhole-face);
-  border-left: 2.2px solid var(--soundhole-face);
-  border-right: 2.2px solid var(--soundhole-face);
-  border-radius: 0 0 10px 10px;
+  width: 11px;
+  height: 5.5px;
+  border-bottom: 2.6px solid #3b2822;
+  border-left: 2.2px solid #3b2822;
+  border-right: 2.2px solid #3b2822;
+  border-radius: 0 0 11px 11px;
   margin-top: -3px;
-  transition: height 0.1s ease;
+  transition: all 0.12s ease;
 }
 
+/* Quando uma nota é tocada, a boquinha vira um "o" cantando, idêntico ao Keylimba */
 .soundhole.bounce .kawaii-mouth {
-  height: 8px;
-  background: var(--soundhole-face);
+  width: 11px;
+  height: 11px;
+  border: none;
+  border-radius: 50%;
+  background: #3b2822;
+  margin-top: -4px;
 }
 
 .tines-row {
@@ -1313,5 +1328,295 @@ html, body {
     padding: 6px;
   }
 }
+
+/* TELA DE INÍCIO MINIMALISTA COM MASCOTE URSO + KEYLIMBA ANIMADO */
+.welcome-splash {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  background: var(--bg-main);
+  z-index: 250;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+  transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1), transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.welcome-splash.dismissed {
+  opacity: 0;
+  transform: scale(1.06);
+  pointer-events: none;
+}
+
+.splash-ambient-blobs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.splash-blob {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--primary-soft);
+  filter: blur(2px);
+  animation: blobFloat 6s infinite ease-in-out alternate;
+}
+
+.splash-blob.blob-1 {
+  width: 160px;
+  height: 160px;
+  top: 12%;
+  left: 14%;
+}
+
+.splash-blob.blob-2 {
+  width: 210px;
+  height: 210px;
+  bottom: 10%;
+  right: 12%;
+  animation-delay: -2.5s;
+}
+
+.splash-blob.blob-3 {
+  width: 90px;
+  height: 90px;
+  top: 22%;
+  right: 22%;
+  animation-delay: -4s;
+}
+
+@keyframes blobFloat {
+  0% { transform: translateY(0px) scale(1); }
+  100% { transform: translateY(-18px) scale(1.08); }
+}
+
+.splash-center-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Silhueta de Urso Minimalista + Carinha Branca Interativa */
+.splash-bear-mascot {
+  position: relative;
+  width: 162px;
+  height: 162px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  --look-x: 0px;
+  --look-y: 0px;
+  --tilt-deg: 0deg;
+  transform: translate(calc(var(--look-x) * 0.25), calc(var(--look-y) * 0.25)) rotate(var(--tilt-deg));
+  transition: transform 0.1s ease-out;
+}
+
+.splash-bear-mascot.smiling-enter {
+  transform: translateY(-10px) scale(1.08) !important;
+  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.splash-bear-ear {
+  position: absolute;
+  top: 4px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--tine-marked-bg);
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.splash-bear-ear.left {
+  left: 8px;
+  animation: earWiggleLeft 3.2s infinite ease-in-out;
+}
+
+.splash-bear-ear.right {
+  right: 8px;
+  animation: earWiggleRight 3.2s infinite ease-in-out;
+}
+
+.ear-inner {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--primary);
+  opacity: 0.45;
+}
+
+@keyframes earWiggleLeft {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(-15deg) scale(1.04); }
+}
+
+@keyframes earWiggleRight {
+  0%, 100% { transform: rotate(8deg); }
+  50% { transform: rotate(15deg) scale(1.04); }
+}
+
+.splash-bear-body {
+  position: relative;
+  z-index: 2;
+  width: 140px;
+  height: 134px;
+  margin-top: 12px;
+  border-radius: 48% 48% 45% 45%;
+  background: var(--tine-marked-bg);
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.10), 0 16px 32px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 16px;
+  overflow: hidden;
+}
+
+/* Lâminas minimalistas todas brancas no topo do urso */
+.splash-mini-tines {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  z-index: 3;
+}
+
+.s-tine {
+  width: 9px;
+  border-radius: 0 0 999px 999px;
+  background: #ffffff;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.08);
+  animation: splashTinePluck 2.5s infinite ease-in-out;
+}
+
+.s-tine.t1 { height: 34px; animation-delay: 0.0s; }
+.s-tine.t2 { height: 42px; animation-delay: 0.25s; }
+.s-tine.t3 { height: 50px; animation-delay: 0.5s; background: #ffffff; }
+.s-tine.t4 { height: 42px; animation-delay: 0.75s; }
+.s-tine.t5 { height: 34px; animation-delay: 1.0s; }
+
+.s-bridge {
+  position: absolute;
+  top: 12px;
+  left: -6px;
+  right: -6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+@keyframes splashTinePluck {
+  0%, 70%, 100% { transform: translateY(0); }
+  85% { transform: translateY(3px); }
+}
+
+/* Círculo Branco no centro do urso que acompanha o mouse/dedo */
+.splash-keylimba-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translate(calc(var(--look-x) * 0.45), calc(var(--look-y) * 0.45));
+  transition: transform 0.08s ease-out;
+}
+
+.splash-keylimba-circle .kawaii-face {
+  transform: translate(var(--look-x), var(--look-y));
+  transition: transform 0.06s ease-out;
+}
+
+/* Boquinha padrão delicada enquanto acompanha o mouse/dedo */
+.splash-keylimba-circle .kawaii-mouth {
+  width: 8px;
+  height: 4px;
+  border-bottom: 2.5px solid #3b2822;
+  border-left: 2px solid #3b2822;
+  border-right: 2px solid #3b2822;
+  border-radius: 0 0 8px 8px;
+  background: transparent;
+  transition: all 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Quando clica / solta o toque: dá um sorrisinho super feliz! */
+.splash-bear-mascot.smiling-enter .splash-keylimba-circle .kawaii-mouth {
+  width: 16px;
+  height: 9px;
+  border-bottom: 3px solid #3b2822;
+  border-left: 2.5px solid #3b2822;
+  border-right: 2.5px solid #3b2822;
+  border-radius: 0 0 16px 16px;
+  background: #ff85a2;
+  transform: scale(1.1);
+}
+
+.splash-bear-mascot.smiling-enter .splash-keylimba-circle .kawaii-cheek {
+  transform: scale(1.3);
+  opacity: 1;
+}
+
+.splash-bear-mascot.smiling-enter .splash-keylimba-circle .kawaii-eye {
+  height: 4px;
+  width: 8px;
+  border-radius: 8px 8px 0 0;
+  transform: translateY(-1px);
+}
+
+.splash-brand-title {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.6px;
+  color: var(--text-main);
+  margin-top: 2px;
+}
+
+.splash-tap-hint {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  padding: 6px 18px;
+  border-radius: 999px;
+  animation: tapPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes tapPulse {
+  0%, 100% { opacity: 0.65; transform: scale(0.98); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+
+@media (max-height: 460px) {
+  .splash-bear-mascot {
+    transform: scale(0.84) translate(calc(var(--look-x) * 0.25), calc(var(--look-y) * 0.25)) rotate(var(--tilt-deg));
+  }
+  .splash-center-content {
+    gap: 6px;
+  }
+  .splash-brand-title {
+    font-size: 24px;
+  }
+}
+
+
 
 
