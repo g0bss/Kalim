@@ -1942,7 +1942,21 @@
     };
 
     document.getElementById("btnInsertRest").onclick = () => {
-      appendTokenToEditorTextarea("-");
+      const ta = document.getElementById("editorTabTextarea");
+      const cur = ta.value.trim();
+      const token = `.*${state.editorSelectedDuration}`;
+      ta.value = cur ? `${cur} ${token}` : token;
+      updateEditorLivePreview();
+    };
+
+    document.getElementById("btnEditorUndo").onclick = () => {
+      const ta = document.getElementById("editorTabTextarea");
+      const text = ta.value.replace(/\s+$/, "");
+      const matches = [...text.matchAll(/\([^)]*\)\S*|\S+/g)];
+      if (!matches.length) return;
+      const last = matches[matches.length - 1];
+      ta.value = text.slice(0, last.index).replace(/\s+$/, "");
+      updateEditorLivePreview();
     };
 
     document.getElementById("editorTabTextarea").oninput = updateEditorLivePreview;

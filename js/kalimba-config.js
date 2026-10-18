@@ -251,6 +251,12 @@ window.KalimbaData = (function () {
           currentBeat += 0.5;
           continue;
         }
+        // Pausa real (silêncio) com duração explícita: .*0.5  .*1  .*2  .*4
+        const restMatch = token.match(/^\.\*(\d+(?:\.\d+)?)$/);
+        if (restMatch) {
+          currentBeat += parseFloat(restMatch[1]) || 1;
+          continue;
+        }
 
         let duration = 1;
         let coreToken = token;
