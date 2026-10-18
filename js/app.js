@@ -67,6 +67,58 @@
       octMid: "#e5988e",
       octHigh: "#68aee0",
       octUltra: "#b794f4"
+    },
+    midnight: {
+      laneMarked: "rgba(110, 168, 254, 0.11)",
+      laneCenter: "rgba(110, 168, 254, 0.16)",
+      laneLine: "rgba(255, 255, 255, 0.06)",
+      barLine: "rgba(255, 255, 255, 0.16)",
+      textMuted: "rgba(139, 160, 196, 0.7)",
+      hitLine: "#6ea8fe",
+      targetFill: "#1c2740",
+      octLow: "#4fd1b5",
+      octMid: "#6ea8fe",
+      octHigh: "#f0a1c4",
+      octUltra: "#b69cf5"
+    },
+    forest: {
+      laneMarked: "rgba(124, 207, 154, 0.11)",
+      laneCenter: "rgba(124, 207, 154, 0.16)",
+      laneLine: "rgba(255, 255, 255, 0.06)",
+      barLine: "rgba(255, 255, 255, 0.16)",
+      textMuted: "rgba(143, 174, 153, 0.7)",
+      hitLine: "#7ccf9a",
+      targetFill: "#1f3328",
+      octLow: "#e6c35c",
+      octMid: "#7ccf9a",
+      octHigh: "#6cb7e6",
+      octUltra: "#d79ae0"
+    },
+    amoled: {
+      laneMarked: "rgba(255, 255, 255, 0.06)",
+      laneCenter: "rgba(180, 140, 255, 0.16)",
+      laneLine: "rgba(255, 255, 255, 0.07)",
+      barLine: "rgba(255, 255, 255, 0.18)",
+      textMuted: "rgba(160, 160, 170, 0.7)",
+      hitLine: "#b48cff",
+      targetFill: "#16161a",
+      octLow: "#4dd8b0",
+      octMid: "#b48cff",
+      octHigh: "#5fb8ff",
+      octUltra: "#ff8fb8"
+    },
+    wine: {
+      laneMarked: "rgba(240, 130, 160, 0.11)",
+      laneCenter: "rgba(240, 130, 160, 0.16)",
+      laneLine: "rgba(255, 255, 255, 0.06)",
+      barLine: "rgba(255, 255, 255, 0.16)",
+      textMuted: "rgba(190, 150, 165, 0.7)",
+      hitLine: "#f082a0",
+      targetFill: "#3a1f2c",
+      octLow: "#6cd4b0",
+      octMid: "#f082a0",
+      octHigh: "#78b8f0",
+      octUltra: "#c9a0f5"
     }
   };
 
@@ -82,11 +134,13 @@
     degreeToKeyMap: {},
 
     songs: [],
-    currentSongId: "no-surprises",
+    currentSongId: "twinkle-star",
     currentSong: null,
 
     // Filtros da Biblioteca
     libraryCategory: "ALL",
+    libraryDifficulty: "ALL",
+    cloudOnline: false,
     librarySearch: "",
     previewingSongId: null,
     previewTimers: [],
@@ -214,23 +268,44 @@
   }
 
   async function loadSongsFromDatabase() {
+    const clientId = window.KalimCloud.getClientId();
     const rawCustom = await window.KalimDB.getAllCustomSongs();
-    const customSongs = rawCustom.map(s => ({
+    const cloud = await window.KalimCloud.fetchAll();
+    state.cloudOnline = cloud.online;
+
+    const decorate = (s, mine) => ({
       ...s,
       isCustom: true,
-      category: s.category || "Minhas Músicas",
+      isMine: mine,
+      isShared: !mine,
+      category: "Minhas Músicas",
+      difficulty: s.difficulty || "Médio",
       events: window.KalimbaData.parseTabStringToNotes(s.tabText || "")
-    }));
+    });
 
-    // Mesclar músicas padrão com músicas criadas pelo usuário
     const map = new Map();
     window.KalimbaData.DEFAULT_SONGS.forEach(s => map.set(s.id, s));
-    customSongs.forEach(s => map.set(s.id, s));
+    cloud.songs.forEach(s => {
+      if (s.id) map.set(s.id, decorate(s, s.createdBy === clientId));
+    });
+    rawCustom.forEach(s => map.set(s.id, decorate({ ...s, createdBy: s.createdBy || clientId }, true)));
 
     state.songs = Array.from(map.values());
+    if (!state.songs.some(s => s.id === state.currentSongId)) {
+      state.currentSongId = state.songs[0] ? state.songs[0].id : "twinkle-star";
+    }
     populateSongSelectors();
     renderLibraryView();
+
+    // Envia para a biblioteca compartilhada as músicas locais que ainda não estão lá
+    if (cloud.online) {
+      const cloudIds = new Set(cloud.songs.map(s => s.id));
+      rawCustom.filter(s => !cloudIds.has(s.id)).forEach(s => {
+        window.KalimCloud.save({ ...s, createdBy: s.createdBy || clientId });
+      });
+    }
   }
+
 
   function populateSongSelectors() {
     const selects = [
@@ -258,30 +333,32 @@
 
     const favs = window.KalimDB.getFavorites();
     const stats = window.KalimDB.getStats();
-    const customCount = state.songs.filter(s => s.isCustom).length;
+    const customCount = state.songs.filter(s => s.isMine).length;
+    const sharedCount = state.songs.filter(s => s.isShared).length;
 
     if (statusEl) {
-      statusEl.textContent = `${state.songs.length} músicas disponíveis (${customCount} criadas por você · ${favs.size} favoritas) — Salvas automaticamente no seu dispositivo.`;
+      if (window.KalimCloud.enabled()) {
+        statusEl.textContent = state.cloudOnline
+          ? `${state.songs.length} músicas (${customCount} suas · ${sharedCount} da comunidade · ${favs.size} favoritas) — Biblioteca compartilhada conectada.`
+          : `${state.songs.length} músicas — sem conexão com a biblioteca compartilhada no momento.`;
+      } else {
+        statusEl.textContent = `${state.songs.length} músicas (${customCount} criadas por você · ${favs.size} favoritas) — Salvas no seu dispositivo. Biblioteca compartilhada não configurada.`;
+      }
     }
 
     const q = state.librarySearch.trim().toLowerCase();
     const filtered = state.songs.filter(song => {
       if (state.libraryCategory === "FAV" && !favs.has(song.id)) return false;
-      if (state.libraryCategory === "CUSTOM" && !song.isCustom) return false;
-      if (
-        state.libraryCategory !== "ALL" &&
-        state.libraryCategory !== "FAV" &&
-        state.libraryCategory !== "CUSTOM" &&
-        song.category !== state.libraryCategory
-      ) {
-        return false;
-      }
+      if (state.libraryCategory === "CUSTOM" && !song.isMine) return false;
+      if (state.libraryCategory === "SHARED" && !song.isShared) return false;
+      if (state.libraryDifficulty !== "ALL" && song.difficulty !== state.libraryDifficulty) return false;
       if (q) {
-        const hay = `${song.title} ${song.artist} ${song.category}`.toLowerCase();
+        const hay = `${song.title} ${song.artist} ${song.difficulty}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
     });
+
 
     grid.innerHTML = "";
 
@@ -336,12 +413,13 @@
 
       const catBadge = document.createElement("span");
       catBadge.className = "meta-badge accent";
-      catBadge.textContent = song.isCustom ? "Autoral" : (song.category || "Padrão");
+      catBadge.textContent = song.isMine ? "Minha" : (song.isShared ? "Comunidade" : "Oficial");
       badges.appendChild(catBadge);
 
       const diffBadge = document.createElement("span");
-      diffBadge.className = "meta-badge";
-      diffBadge.textContent = song.difficulty || "Normal";
+      diffBadge.className = "meta-badge diff-" + (song.difficulty || "Médio").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      diffBadge.textContent = song.difficulty || "Médio";
+
       badges.appendChild(diffBadge);
 
       const notesBadge = document.createElement("span");
@@ -412,14 +490,16 @@
       actions.appendChild(btnViewCifra);
       actions.appendChild(btnEdit);
 
-      if (song.isCustom) {
+      if (song.isMine) {
         const btnDel = document.createElement("button");
         btnDel.className = "clean-btn danger";
         btnDel.textContent = "Excluir";
         btnDel.onclick = async () => {
           stopLibraryPreview();
           await window.KalimDB.deleteCustomSong(song.id);
+          await window.KalimCloud.remove(song.id);
           await loadSongsFromDatabase();
+
           if (state.currentSongId === song.id) {
             selectSong(state.songs[0]?.id);
           }
@@ -1484,6 +1564,7 @@
     document.getElementById("editorArtist").value = song.artist || "";
     document.getElementById("editorBpm").value = song.bpm || 100;
     document.getElementById("editorMinKeys").value = song.minKeys || 17;
+    document.getElementById("editorDifficulty").value = ["Fácil", "Médio", "Difícil"].includes(song.difficulty) ? song.difficulty : "Médio";
     document.getElementById("editorTabTextarea").value = song.tabText || "";
     updateEditorLivePreview();
   }
@@ -1650,6 +1731,15 @@
         document.querySelectorAll("#libraryCategories .cat-pill").forEach(p => p.classList.remove("active"));
         pill.classList.add("active");
         state.libraryCategory = pill.dataset.cat;
+        renderLibraryView();
+      };
+    });
+
+    document.querySelectorAll("#libraryDifficulties .cat-pill").forEach(pill => {
+      pill.onclick = () => {
+        document.querySelectorAll("#libraryDifficulties .cat-pill").forEach(p => p.classList.remove("active"));
+        pill.classList.add("active");
+        state.libraryDifficulty = pill.dataset.diff;
         renderLibraryView();
       };
     });
@@ -1894,7 +1984,7 @@
           id: songObj.id.replace(/^custom-/, ""),
           title: songObj.title,
           artist: songObj.artist,
-          difficulty: "Intermediário",
+          difficulty: songObj.difficulty,
           minKeys: songObj.minKeys,
           bpm: songObj.bpm,
           category: "Comunidade",
@@ -1938,19 +2028,23 @@
       return null;
     }
 
-    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || ("custom-" + Date.now());
+    const difficulty = document.getElementById("editorDifficulty").value || "Médio";
+    const clientId = window.KalimCloud.getClientId();
+    const slug = title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || ("musica-" + Date.now());
     return {
-      id: "custom-" + slug,
+      id: "custom-" + slug + "-" + clientId.slice(-5),
       title,
       artist,
       bpm,
       minKeys,
-      difficulty: "Personalizada",
+      difficulty,
       category: "Minhas Músicas",
       description: "Criada no Estúdio do Kalim",
       tabText,
       events,
-      isCustom: true
+      createdBy: clientId,
+      isCustom: true,
+      isMine: true
     };
   }
 

@@ -72,12 +72,13 @@ window.KalimDB = (function () {
       id: songObj.id,
       title: songObj.title,
       artist: songObj.artist,
-      difficulty: songObj.difficulty || "Personalizada",
+      difficulty: songObj.difficulty || "Médio",
       minKeys: songObj.minKeys || 17,
       bpm: songObj.bpm || 100,
       category: songObj.category || "Minhas Músicas",
       description: songObj.description || "Criada no Kalim",
       tabText: songObj.tabText,
+      createdBy: songObj.createdBy || (window.KalimCloud ? window.KalimCloud.getClientId() : ""),
       updatedAt: Date.now(),
       isCustom: true
     };
@@ -98,8 +99,13 @@ window.KalimDB = (function () {
         tx.objectStore("songs").put(clean);
       } catch (e) {}
     }
+
+    if (window.KalimCloud && window.KalimCloud.enabled()) {
+      clean.cloudSynced = await window.KalimCloud.save(clean);
+    }
     return clean;
   }
+
 
   async function deleteCustomSong(songId) {
     const current = await getAllCustomSongs();
